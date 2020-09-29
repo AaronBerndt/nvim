@@ -9,7 +9,7 @@ call plug#begin('~/.local/share/nvim/plugged')
  Plug 'tpope/vim-fugitive'
  " Plug 'airblade/vim-gitgutter'
 "Fuzzy Finder
-Plug '/usr/local/opt/fzf'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 "Language Highlighting
 Plug 'sheerun/vim-polyglot'
@@ -25,9 +25,7 @@ Plug 'justinmk/vim-sneak'
 Plug 'svermeulen/vim-cutlass'
 Plug 'svermeulen/vim-subversive'
 "StatusLine
-" Plug 'ap/vim-buftabline'
 Plug 'itchyny/lightline.vim'
-" Plug 'maximbaz/lightline-ale'
 "Testing
 Plug 'janko-m/vim-test'
 "Highlighting
@@ -37,12 +35,8 @@ Plug 'janko-m/vim-test'
  " Plug 'SirVer/ultisnips'
  Plug 'honza/vim-snippets'
  "Autoformater
- " Plug 'sbdchd/neoformat'
- " Plug 'ambv/black'
- " Plug 'prettier/vim-prettier'
  Plug 'alvan/vim-closetag'
  "Extra TOols
- " Plug 'myusuf3/numbers.vim'
  Plug 'ryanoasis/vim-devicons'
 call plug#end()
 "EndRegion
