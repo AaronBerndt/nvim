@@ -13,7 +13,7 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 "Language Highlighting
 Plug 'sheerun/vim-polyglot'
-Plug 'uiiaoo/java-syntax.vim'
+Plug 'ekalinin/Dockerfile.vim'
  " Plug 'nvim-treesitter/nvim-treesitter'
 "New Motions
 Plug 'romainl/vim-cool'
