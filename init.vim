@@ -12,6 +12,7 @@ colorscheme palenight
 set termguicolors
 
 set cursorline
+set shell=/home/linuxbrew/.linuxbrew/bin/zsh
 "Menu
 set wildoptions+=pum
 "Search
