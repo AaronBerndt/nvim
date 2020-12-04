@@ -12,7 +12,7 @@ endfunction
    let fileType = expand('%:e')
    if fileType == 'py'
 	  :Black
-   elseif fileType == 'js' || fileType == 'json' || fileType == 'java'|| fileType == 'tsx' || fileType == 'ts' ||'groovy'
+   elseif fileType == 'js' || fileType == 'json' || fileType == 'tsx' || fileType == 'ts' 
 	  command! -nargs=0 Prettier :CocCommand prettier.formatFile
 	  :Prettier
    endif
@@ -25,7 +25,7 @@ endfunction
   	let config_dir = substitute(fileName,"Commands","Config","")
         let newFilePath = config_dir .'.config.json'
     elseif fileType == 'tsx'
-         let newFilePath = './' . fileName . ".stories.tsx"
+        let newFilePath = fileName . '.stories.' . fileType
     endif
 
     execute "vsplit" newFilePath
@@ -34,22 +34,8 @@ endfunction
  function FindTest()
    let fileName = expand('%:r')
    let fileType = expand('%:e')
-   let fileDir = expand('%:p:h')
-   if fileType == 'py'
-        let newFilePath = fileDir . "/tests/" . "test_" . fileName
-   elseif fileType == 'js'
-        let newFilePath = fileDir . "/__tests__/" . "test_" . fileName
-   elseif fileType == 'tsx'
-        let newFilePath = fileDir . ".test.tsx"
-   elseif fileType == 'java'
-	let fileDir = substitute(fileName,"main","test","")
-	let fileDir = substitute(fileDir,"java","groovy","")
-	let newFilePath = fileDir  . 'Spec.groovy'
-   elseif fileType == 'groovy'
-	let fileDir = substitute(fileName,"test","main","")
-	let fileDir = substitute(fileDir,"groovy","java","")
-	let fileDir = substitute(fileDir,"Spec","","")
-	let newFilePath = fileDir  . '.java'
+   if fileType == 'tsx' || fileType == 'ts' || fileType == 'js'
+        let newFilePath = fileName . '.test.' . fileType
    endif
    execute "vsplit" newFilePath
  endfunction

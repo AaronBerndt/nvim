@@ -1,13 +1,8 @@
 "KeyBindings
 let mapleader=" "
 nnoremap Q <Nop> 
-"Gradle
-nmap <Leader>gb :vs <bar> terminal ./gradlew build <cr>
-nmap <Leader>gt :vs <bar> terminal ./gradlew test --info <cr>
 "Subverse
 nmap <Leader>r <plug>(SubversiveSubstitute)
-nmap <Leader>rr <plug>(SubversiveSubstituteLine)
-nmap <Leader>R <plug>(SubversiveSubstituteToEndOfLine)
 "Fuzzy Finder
 nmap <Leader>b :Buffers<CR>
 nmap <Leader>f :Files<CR>
@@ -36,11 +31,9 @@ endfunction
 let g:coc_snippet_next = '<tab>'
 
 nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
-nmap <leader> gf <Plug>(coc-format-selected)
-nmap <leader>rn <Plug>(coc-rename)
+nmap <leader>ar <Plug>(coc-rename)
+
 
 
 "BufferLine
@@ -59,18 +52,23 @@ nnoremap <C-J> <C-W><C-J>
 nnoremap <C-H> <C-W><C-H>
 nnoremap <C-K> <C-W><C-K>
 "Tests
-nmap <Leader>tt :terminal npm run test<CR> 
+nmap <Leader>tt :vs <bar> terminal yarn test <cr>
 nmap <Leader>tn :TestNearest<CR> 
 nmap <Leader>tf :TestFile<CR>    
 nmap <Leader>ts :TestSuite<CR>   
 nmap <Leader>tl :TestLast<CR>    
 nmap <Leader>tv :TestVisit<CR>   
+"Yarn
+nmap <Leader>yg :vs <bar> terminal yarn generate <cr>
+nmap <Leader>yb :vs <bar> terminal yarn build <cr>
+nmap <Leader>yl :vs <bar> terminal yarn lint <cr>
+nmap <Leader>yt :vs <bar> terminal yarn test <cr>
 "Git
 nmap <Leader>gs :Gstatus<cr>
 nmap <Leader>gc :Gcommit -v<cr>
 nmap <Leader>ga :Git add -p<cr>
 nmap <Leader>gm :Gcommit --amend<cr>
-nmap <Leader>gp :Git push<cr>
+nmap <Leader>gp :vs <bar> terminal git push  <cr>
 nmap <Leader>gd :Gdiff<cr>
 nmap <Leader>gw :Gwrite<cr>
 " Auto Complete

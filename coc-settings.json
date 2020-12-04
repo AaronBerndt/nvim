@@ -1,4 +1,8 @@
 {
-  "explorer.icon.enableNerdfont": true,
-  "explorer.previewAction.onHover": false
+  "explorer.icon.enableNerdfont": false,
+  "explorer.icon.enableVimDevicons": false,
+  "explorer.previewAction.onHover": false,
+  "explorer.file.showHiddenFiles": true,
+  "explorer.enableFloatinput": true,
+  "coc.preferences.enableFloatHighlight": true
 }
