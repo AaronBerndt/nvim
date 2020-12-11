@@ -60,6 +60,7 @@ nmap <Leader>tl :TestLast<CR>
 nmap <Leader>tv :TestVisit<CR>   
 "Yarn
 nmap <Leader>yg :vs <bar> terminal yarn generate <cr>
+nmap <Leader>ys :vs <bar> terminal yarn storybook <cr>
 nmap <Leader>yb :vs <bar> terminal yarn build <cr>
 nmap <Leader>yl :vs <bar> terminal yarn lint <cr>
 nmap <Leader>yt :vs <bar> terminal yarn test <cr>
@@ -67,7 +68,9 @@ nmap <Leader>yt :vs <bar> terminal yarn test <cr>
 nmap <Leader>gs :Gstatus<cr>
 nmap <Leader>gc :Gcommit -v<cr>
 nmap <Leader>ga :Git add -p<cr>
-nmap <Leader>gm :Gcommit --amend<cr>
+nmap <Leader>gu :Gpull
+nmap <Leader>gj :diffget //3<cr>
+nmap <Leader>gf :diffget //5<cr>
 nmap <Leader>gp :vs <bar> terminal git push  <cr>
 nmap <Leader>gd :Gdiff<cr>
 nmap <Leader>gw :Gwrite<cr>

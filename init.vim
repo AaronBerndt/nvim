@@ -18,7 +18,6 @@ hi CocWarningHighlight ctermfg=yellow guifg=#c4ab39 gui=underline term=underline
 "" EndRegion
 "" Test
 let test#strategy = "neovim"
-let g:test#preserve_screen = 1
 if has('nvim')
   let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
   let $NVIM_TUI_ENABLE_TRUE_COLOR=1

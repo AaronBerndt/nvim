@@ -11,6 +11,7 @@ call plug#begin('~/.local/share/nvim/plugged')
   
 "Github
   Plug 'tpope/vim-fugitive'
+  Plug 'stsewd/fzf-checkout.vim'
   Plug 'airblade/vim-gitgutter'
 "Fuzzy Finder
  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
