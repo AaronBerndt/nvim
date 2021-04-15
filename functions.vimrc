@@ -21,22 +21,14 @@ endfunction
   function FindExtra()
     let fileType = expand('%:e')
     let fileName = expand('%:r')
-    if fileType == 'py'
-  	let config_dir = substitute(fileName,"Commands","Config","")
-        let newFilePath = config_dir .'.config.json'
-    elseif fileType == 'tsx'
-        let newFilePath = fileName . '.stories.' . fileType
-    endif
-
+    let newFilePath = fileName . '.stories.' . fileType
     execute "vsplit" newFilePath
   endfunction
 "Find Test
  function FindTest()
    let fileName = expand('%:r')
    let fileType = expand('%:e')
-   if fileType == 'tsx' || fileType == 'ts' || fileType == 'js'
-        let newFilePath = fileName . '.test.' . fileType
-   endif
+   let newFilePath = fileName . '.test.' . fileType
    execute "vsplit" newFilePath
  endfunction
 
