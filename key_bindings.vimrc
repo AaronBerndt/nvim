@@ -33,6 +33,10 @@ let g:coc_snippet_next = '<tab>'
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gr <Plug>(coc-references)
 nmap <leader>ar <Plug>(coc-rename)
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>aw  <Plug>(coc-codeaction-selected)w
+
+
 
 
 
@@ -60,6 +64,7 @@ nmap <Leader>tl :TestLast<CR>
 nmap <Leader>tv :TestVisit<CR>   
 "Yarn
 nmap <Leader>yg :vs <bar> terminal yarn generate <cr>
+nmap <Leader>yy :vs <bar> terminal yarn start <cr>
 nmap <Leader>ys :vs <bar> terminal yarn storybook <cr>
 nmap <Leader>yb :vs <bar> terminal yarn build <cr>
 nmap <Leader>yl :vs <bar> terminal yarn lint <cr>

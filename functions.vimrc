@@ -22,6 +22,18 @@ endfunction
     let fileType = expand('%:e')
     let fileName = expand('%:r')
     let newFilePath = fileName . '.stories.' . fileType
+
+    " if match(fileName, 'stories' )
+    "   let newFileName = substitute(fileName, '.stories', '.', '')
+    "   echo newFileName
+    "   let newFilePath = newFileName . fileType
+    " endif
+
+    " if match(fileName, 'test' )
+    "   let newFileName = substitute(fileName, 'test', 'stories', '')
+    "   let newFilePath = newFileName . fileType
+    " endif
+
     execute "vsplit" newFilePath
   endfunction
 "Find Test
@@ -29,6 +41,18 @@ endfunction
    let fileName = expand('%:r')
    let fileType = expand('%:e')
    let newFilePath = fileName . '.test.' . fileType
+
+   " if match(fileName, 'test' )
+   "   let newFileName = substitute(fileName, '.test', '.', '')
+   "   let newFilePath = newFileName . fileType
+   "   echo newFilePath
+   " endif
+
+   " if match(fileName, 'stories')
+   "   let newFileName = substitute(fileName, 'test', 'stories', '')
+   "   let newFilePath = newFileName . fileType
+   " endif
+
    execute "vsplit" newFilePath
  endfunction
 
