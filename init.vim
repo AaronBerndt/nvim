@@ -51,5 +51,8 @@ au TermOpen * setlocal listchars= nonumber norelativenumber
 au TermOpen * startinsert
 au BufEnter,BufWinEnter,WinEnter term://* startinsert
 au BufLeave term://* stopinsert
-"TreeSitter
+"Region TreeSitter
+lua require'nvim-treesitter.configs'.setup { highlight = { enable = true } }
+
+"EndRegion
 

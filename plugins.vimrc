@@ -2,6 +2,7 @@
 call plug#begin('~/.local/share/nvim/plugged')
 "Color
   " Plug 'drewtempelmeyer/palenight.vim'
+  Plug 'arcticicestudio/nord-vim'
   Plug 'christianchiarulli/nvcode-color-schemes.vim'
   "
 "Auto Complete /Language Server
@@ -17,9 +18,9 @@ call plug#begin('~/.local/share/nvim/plugged')
  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
  Plug 'junegunn/fzf.vim'
 "Language Highlighting
- Plug 'sheerun/vim-polyglot'
+ " Plug 'sheerun/vim-polyglot'
  Plug 'ekalinin/Dockerfile.vim'
- " Plug 'nvim-treesitter/nvim-treesitter'
+ Plug 'nvim-treesitter/nvim-treesitter'
 "New Motions
  Plug 'romainl/vim-cool'
  Plug 'wellle/targets.vim'
@@ -43,5 +44,6 @@ call plug#begin('~/.local/share/nvim/plugged')
   Plug 'alvan/vim-closetag'
  "Extra TOols
   Plug 'ryanoasis/vim-devicons'
+  Plug 'metakirby5/codi.vim'
 call plug#end()
 "EndRegion
