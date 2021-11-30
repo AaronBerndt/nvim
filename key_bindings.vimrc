@@ -69,10 +69,11 @@ nmap <Leader>ys :vs <bar> terminal yarn storybook <cr>
 nmap <Leader>yb :vs <bar> terminal yarn build <cr>
 nmap <Leader>yl :vs <bar> terminal yarn lint <cr>
 nmap <Leader>yt :vs <bar> terminal yarn test <cr>
+nmap <Leader>yd :vs <bar> terminal yarn run_dev <cr>
 "Git
 nmap <Leader>gf :diffgit //2<cr>
 nmap <Leader>gj :diffgit //3<cr>
-nmap <Leader>gs :Gstatus<cr>
+nmap <Leader>gs :Git<cr>
 nmap <Leader>gc :Git commit -v<cr>
 nmap <Leader>ga :Git add -p<cr>
 nmap <Leader>gu :Gpull
