@@ -1,6 +1,5 @@
 {
   "explorer.icon.enableNerdfont": false,
-  "explorer.icon.enableVimDevicons": false,
   "explorer.previewAction.onHover": false,
   "explorer.file.showHiddenFiles": true,
   "explorer.enableFloatinput": true,

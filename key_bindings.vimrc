@@ -89,3 +89,4 @@ nmap <Leader>p  :call FixFile()<CR>
 "DisableStuff
 nmap <Leader>! :call DisablePrettyStuff()<CR>
 "EndRegion
+

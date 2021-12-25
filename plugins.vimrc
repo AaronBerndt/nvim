@@ -47,3 +47,4 @@ call plug#begin('~/.local/share/nvim/plugged')
   Plug 'metakirby5/codi.vim'
 call plug#end()
 "EndRegion
+

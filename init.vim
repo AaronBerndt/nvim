@@ -55,4 +55,3 @@ au BufLeave term://* stopinsert
 lua require'nvim-treesitter.configs'.setup { highlight = { enable = true } }
 
 "EndRegion
-

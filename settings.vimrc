@@ -18,4 +18,3 @@ set smartcase
 set hlsearch
 set nobackup
 set nowritebackup
-
