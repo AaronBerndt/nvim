@@ -1,14 +1,11 @@
 "Region Plugins
 call plug#begin('~/.local/share/nvim/plugged')
 "Color
-  " Plug 'drewtempelmeyer/palenight.vim'
-  Plug 'arcticicestudio/nord-vim'
+  Plug 'shaunsingh/nord.nvim'
   Plug 'christianchiarulli/nvcode-color-schemes.vim'
   "
 "Auto Complete /Language Server
-  Plug 'w0rp/ale'
   Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
   
 "Github
   Plug 'tpope/vim-fugitive'
@@ -17,8 +14,9 @@ call plug#begin('~/.local/share/nvim/plugged')
 "Fuzzy Finder
  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
  Plug 'junegunn/fzf.vim'
+ Plug 'nvim-lua/plenary.nvim'
+ Plug 'nvim-telescope/telescope.nvim', { 'tag': '0.1.2' }
 "Language Highlighting
- " Plug 'sheerun/vim-polyglot'
  Plug 'ekalinin/Dockerfile.vim'
  Plug 'nvim-treesitter/nvim-treesitter'
 "New Motions
@@ -31,7 +29,8 @@ call plug#begin('~/.local/share/nvim/plugged')
  Plug 'svermeulen/vim-cutlass'
  Plug 'svermeulen/vim-subversive'
 "StatusLine
- Plug 'itchyny/lightline.vim'
+ Plug 'nvim-lualine/lualine.nvim'
+ Plug 'kyazdani42/nvim-web-devicons'
 "Testing
  Plug 'janko-m/vim-test'
 "Highlighting
@@ -42,8 +41,10 @@ call plug#begin('~/.local/share/nvim/plugged')
   Plug 'honza/vim-snippets'
  "Autoformater
   Plug 'alvan/vim-closetag'
- "Extra TOols
-  Plug 'ryanoasis/vim-devicons'
+ "Addons
+  " Plug 'karb94/neoscroll.nvim'
+ "Extra Tools
+ Plug 'nvim-tree/nvim-web-devicons'
   Plug 'metakirby5/codi.vim'
 call plug#end()
 "EndRegion

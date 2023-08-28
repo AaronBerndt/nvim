@@ -1,7 +1,8 @@
 {
-  "explorer.icon.enableNerdfont": false,
   "explorer.previewAction.onHover": false,
   "explorer.file.showHiddenFiles": true,
   "explorer.enableFloatinput": true,
-  "coc.preferences.enableFloatHighlight": true
+  "explorer.icon.source": "nvim-web-devicons",
+  "coc.preferences.enableFloatHighlight": true,
+  "colors.enable": true
 }

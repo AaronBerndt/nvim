@@ -4,9 +4,10 @@ nnoremap Q <Nop>
 "Subverse
 nmap <Leader>r <plug>(SubversiveSubstitute)
 "Fuzzy Finder
-nmap <Leader>b :Buffers<CR>
-nmap <Leader>f :Files<CR>
-nmap <Leader>h :History<CR>
+nmap <Leader>f <cmd>Telescope find_files<cr>
+nmap <Leader>g <cmd>Telescope live_grep<cr>
+nmap <Leader>b <cmd>Telescope buffers<cr>
+nmap <Leader>h <cmd>Telescope history<cr>
 nmap <Leader>n :CocCommand explorer<CR>
 
 nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
@@ -16,13 +17,16 @@ map F <Plug>Sneak_F
 map t <Plug>Sneak_t
 map T <Plug>Sneak_T
 "Coc
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+inoremap <silent><expr> <C-x><C-z> coc#pum#visible() ? coc#pum#stop() : "\<C-x>\<C-z>"
+" remap for complete to use tab and <cr>
 inoremap <silent><expr> <TAB>
-      \ pumvisible() ? coc#_select_confirm() :
-      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
- 
+\ coc#pum#visible() ? coc#pum#next(1):
+\ <SID>check_back_space() ? "\<Tab>" :
+\ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+inoremap <silent><expr> <c-space> coc#refresh()
+
 function! s:check_back_space() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
@@ -44,7 +48,7 @@ nmap <leader>aw  <Plug>(coc-codeaction-selected)w
 nnoremap <C-N> :bnext<CR>
 nnoremap <C-P> :bprev<CR>
 "Terminal
-" nmap <Leader>` :terminal<CR>
+nmap <Leader>` :terminal<CR>
 "Split
 noremap <silent> <leader>ht :split <bar> :terminal<CR>
 noremap <silent> <leader>vt :vsplit <bar> :terminal<CR>
