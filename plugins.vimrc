@@ -45,7 +45,8 @@ call plug#begin('~/.local/share/nvim/plugged')
   " Plug 'karb94/neoscroll.nvim'
  "Extra Tools
  Plug 'nvim-tree/nvim-web-devicons'
-  Plug 'metakirby5/codi.vim'
+ Plug 'metakirby5/codi.vim'
+ Plug 'github/copilot.vim'
 call plug#end()
 "EndRegion
 
