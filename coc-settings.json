@@ -2,7 +2,7 @@
   "explorer.previewAction.onHover": false,
   "explorer.file.showHiddenFiles": true,
   "explorer.enableFloatinput": true,
-  "explorer.icon.source": "nvim-web-devicons",
+  "explorer.icon.enableNerdfont": true,
   "coc.preferences.enableFloatHighlight": true,
   "colors.enable": true
 }
