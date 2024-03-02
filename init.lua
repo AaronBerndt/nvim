@@ -148,6 +148,7 @@ require("lazy").setup({
      status = { virtual_text = true },
      output = { open_on_run = true },
      config = function()
+
        require("neotest").setup({})
        vim.keymap.set('n', '<leader>tf', ':Neotest run file<CR>', {})
      end
@@ -161,18 +162,7 @@ require("lazy").setup({
         "rcarriga/nvim-notify",
       }
 },
-{
      "VonHeikemen/lsp-zero.nvim",
-     config = function()
-       require("lsp-zero").setup()
-       local lsp_zero = require('lsp-zero')
-
-       lsp_zero.on_attach(function(client, bufnr)
-  	lsp_zero.default_keymaps({buffer = bufnr})
-       end)
-     end
-},
-
 {
       "williamboman/mason.nvim",
       dependencies ={ "williamboman/mason-lspconfig.nvim", "neovim/nvim-lspconfig" },
@@ -187,6 +177,15 @@ require("lazy").setup({
 
           },
 	})
+
+
+       lsp_zero.on_attach(function(client, bufnr)
+	local buf = {buffer = bufnr}
+  	lsp_zero.default_keymaps(buf)
+	 vim.keymap.set('n', '<leader>ar', '<cmd>lua vim.lsp.buf.rename()<cr>', buf)
+	 vim.keymap.set('n', '<leader>aw', '<cmd>lua vim.lsp.buf.code_action()<cr>', buf)
+	 vim.keymap.set('n', '<leader>p', '<cmd>lua vim.lsp.buf.format({async = true})<cr', buf)
+       end)
       end
 },
 {
@@ -212,7 +211,39 @@ require("lazy").setup({
   lazy = false,
   priority = 1000,
   opts = {},
+},
+{
+  "epwalsh/obsidian.nvim",
+  version = "*",  -- recommended, use latest release instead of latest commit
+  lazy = true,
+  ft = "markdown",
+  -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
+  -- event = {
+  --   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
+  --   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
+  --   "BufReadPre path/to/my-vault/**.md",
+  --   "BufNewFile path/to/my-vault/**.md",
+  -- },
+  dependencies = {
+    -- Required.
+    "nvim-lua/plenary.nvim",
+
+    -- see below for full list of optional dependencies 👇
+  },
+  opts = {
+    workspaces = {
+      {
+        name = "personal",
+        path = "~/vaults/personal",
+      },
+      {
+        name = "work",
+        path = "~/vaults/work",
+      },
+    },
+  },
 }
+
 })
 
 -- settings
@@ -224,4 +255,6 @@ vim.opt.cursorline = true
 -- keybindings
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
-vim.keymap.set("v", "yy", ":TerminalToggle direction='float' <CR>")
+vim.keymap.set("n", "<leader>ar", "")
+vim.keymap.set("n", "<leader>yy", ":ToggleTerm direction='float' cmd='yarn start' <CR>")
+vim.keymap.set("n", "<leader>ys", ":ToggleTerm direction='float' cmd='yarn storybook' <CR>")
