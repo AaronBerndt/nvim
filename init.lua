@@ -16,27 +16,45 @@ require("lazy").setup({
 	"folke/which-key.nvim",
 	"folke/neodev.nvim",
 	"shaunsingh/nord.nvim",
-	'github/copilot.vim',
-	'metakirby5/codi.vim',
-	'svermeulen/vim-subversive',
+	"github/copilot.vim",
+	"metakirby5/codi.vim",
+	"svermeulen/vim-subversive",
 	{
 		"folke/neoconf.nvim",
-		cmd = "Neoconf"
+		cmd = "Neoconf",
 	},
 
 	{
 		"tpope/vim-fugitive",
 		config = function()
-			vim.keymap.set('n', '<leader>gs', ':Git<CR>', {})
-			vim.keymap.set('n', '<leader>gc', ':Git commit<CR>', {})
-			vim.keymap.set('n', '<leader>gp', ':Git push<CR>', {})
-		end
+			vim.keymap.set("n", "<leader>gs", ":Git<CR>", {})
+			vim.keymap.set("n", "<leader>gc", ":Git commit<CR>", {})
+			vim.keymap.set("n", "<leader>gp", ":Git push<CR>", {})
+		end,
 	},
 	{
-		'akinsho/toggleterm.nvim',
-		version = "*",
-		config = true
+		"stevearc/conform.nvim",
+		opts = {},
 
+		config = function(args)
+			require("conform").setup({
+				formatters_by_ft = {
+					lua = { "stylua" },
+					-- Conform will run multiple formatters sequentially
+					python = { "isort", "black" },
+					typescript = { { "prettierd" } },
+					typescriptreact = { { "prettierd" } },
+					javascript = { { "prettierd" } },
+				},
+			})
+
+			vim.keymap.set("n", "<leader>p", require("conform").format, {})
+		end,
+	},
+	{
+		"akinsho/toggleterm.nvim",
+		version = "*",
+		config = true,
 	},
 	{
 		"kylechui/nvim-surround",
@@ -44,14 +62,14 @@ require("lazy").setup({
 		event = "VeryLazy",
 		config = function()
 			require("nvim-surround").setup({})
-		end
+		end,
 	},
 	{
 		"numToStr/Comment.nvim",
 		lazy = false,
 		config = function()
-			require('Comment').setup()
-		end
+			require("Comment").setup()
+		end,
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -60,25 +78,36 @@ require("lazy").setup({
 			local configs = require("nvim-treesitter.configs")
 
 			configs.setup({
-				ensure_installed = { "ruby", "lua", "vim", "vimdoc", "javascript", "html", 'css', 'typescript', 'tsx', 'xml' },
+				ensure_installed = {
+					"ruby",
+					"lua",
+					"vim",
+					"vimdoc",
+					"javascript",
+					"html",
+					"css",
+					"typescript",
+					"tsx",
+					"xml",
+				},
 				sync_install = false,
 				highlight = { enable = true },
 				indent = { enable = true },
 			})
-		end
+		end,
 	},
 	{
-		'nvim-lualine/lualine.nvim',
-		dependencies = { 'nvim-tree/nvim-web-devicons' },
+		"nvim-lualine/lualine.nvim",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
 		config = function()
 			local colors = {
-				blue   = '#80a0ff',
-				cyan   = '#79dac8',
-				black  = '#080808',
-				white  = '#c6c6c6',
-				red    = '#ff5189',
-				violet = '#d183e8',
-				grey   = '#303030',
+				blue = "#80a0ff",
+				cyan = "#79dac8",
+				black = "#080808",
+				white = "#c6c6c6",
+				red = "#ff5189",
+				violet = "#d183e8",
+				grey = "#303030",
 			}
 
 			local bubbles_theme = {
@@ -97,70 +126,70 @@ require("lazy").setup({
 					c = { fg = colors.black, bg = colors.black },
 				},
 			}
-			require('lualine').setup({
+			require("lualine").setup({
 				options = {
 					theme = bubbles_theme,
-					component_separatorsder = '|',
-					section_separators = { left = '', right = '' },
+					component_separatorsder = "|",
+					section_separators = { left = "", right = "" },
 				},
 				sections = {
 					lualine_a = {
-						{ 'mode', separator = { left = '' }, right_padding = 2 },
+						{ "mode", separator = { left = "" }, right_padding = 2 },
 					},
-					lualine_b = { 'filename', 'branch' },
-					lualine_c = { 'fileformat' },
+					lualine_b = { "filename", "branch" },
+					lualine_c = { "fileformat" },
 					lualine_x = {},
-					lualine_y = { 'filetype', 'progress' },
+					lualine_y = { "filetype", "progress" },
 					lualine_z = {
-						{ 'location', separator = { right = '' }, left_padding = 2 },
+						{ "location", separator = { right = "" }, left_padding = 2 },
 					},
 				},
 				inactive_sections = {
-					lualine_a = { 'filename' },
+					lualine_a = { "filename" },
 					lualine_b = {},
 					lualine_c = {},
 					lualine_x = {},
 					lualine_y = {},
-					lualine_z = { 'location' },
+					lualine_z = { "location" },
 				},
 				tabline = {},
-				extensions = {}
+				extensions = {},
 			})
-		end
+		end,
 	},
 	{
-		'nvim-telescope/telescope.nvim',
-		tag = '0.1.5',
-		dependencies = { 'nvim-lua/plenary.nvim' },
+		"nvim-telescope/telescope.nvim",
+		tag = "0.1.5",
+		dependencies = { "nvim-lua/plenary.nvim" },
 
 		config = function()
-			local builtin = require('telescope.builtin')
-			vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
-			vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
-			vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
-			vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
-			vim.keymap.set('n', '<leader>gb', builtin.git_branches, {})
-		end
+			local builtin = require("telescope.builtin")
+			vim.keymap.set("n", "<leader>ff", builtin.find_files, {})
+			vim.keymap.set("n", "<leader>fg", builtin.live_grep, {})
+			vim.keymap.set("n", "<leader>fb", builtin.buffers, {})
+			vim.keymap.set("n", "<leader>fh", builtin.help_tags, {})
+			vim.keymap.set("n", "<leader>gb", builtin.git_branches, {})
+		end,
 	},
 	{
 		"nvim-neotest/neotest",
-		dependencies = { "nvim-neotest/neotest-plenary", 'nvim-neotest/neotest-jest', "thenbe/neotest-playwright"  },
-		opts = { adapters = { "neotest-plenary", 'neotest-jest', "neotest-playwright" } },
+		dependencies = { "nvim-neotest/neotest-plenary", "nvim-neotest/neotest-jest", "thenbe/neotest-playwright" },
+		opts = { adapters = { "neotest-plenary", "neotest-jest", "neotest-playwright" } },
 		status = { virtual_text = true },
 		output = { open_on_run = true },
 		config = function()
 			require("neotest").setup({
 
 				adapters = {
-					require('neotest-jest')({
-						jestCommand = require('neotest-jest.jest-util').getJestCommand(vim.fn
-							.expand '%:p:h') .. ' --watch',
-					}) }
-
+					require("neotest-jest")({
+						jestCommand = require("neotest-jest.jest-util").getJestCommand(vim.fn.expand("%:p:h"))
+							.. " --watch",
+					}),
+				},
 			})
-			vim.keymap.set('n', '<leader>tf', ':Neotest run file<CR>', {})
-			vim.keymap.set('n', '<leader>tn', ':Neotest run run<CR>', {})
-		end
+			vim.keymap.set("n", "<leader>tf", ":Neotest run file<CR>", {})
+			vim.keymap.set("n", "<leader>tn", ":Neotest run run<CR>", {})
+		end,
 	},
 	{
 		"folke/noice.nvim",
@@ -169,7 +198,7 @@ require("lazy").setup({
 		dependencies = {
 			"MunifTanjim/nui.nvim",
 			"rcarriga/nvim-notify",
-		}
+		},
 	},
 	"VonHeikemen/lsp-zero.nvim",
 	{
@@ -177,36 +206,32 @@ require("lazy").setup({
 		dependencies = { "williamboman/mason-lspconfig.nvim", "neovim/nvim-lspconfig" },
 
 		config = function()
-			local lsp_zero = require('lsp-zero')
+			local lsp_zero = require("lsp-zero")
 			require("mason").setup()
 			require("mason-lspconfig").setup({
-				ensure_installed = { 'tsserver', 'prettierd', 'angularjs', 'lua_ls' }
+				ensure_installed = { "tsserver", "angularjs", "lua_ls" },
 			})
 
 			on_attach = function(_, _)
 				-- local buf = { buffer = bufnr }
-				vim.keymap.set('n', '<leader>gd', vim.lsp.buf.definition, {})
-				vim.keymap.set('n', '<leader>gi', vim.lsp.buf.implementation, {})
-				vim.keymap.set('n', '<leader>ar', vim.lsp.buf.rename, {})
-				vim.keymap.set('n', '<leader>aw', vim.lsp.buf.code_action, {})
-				vim.keymap.set('n', '<leader>ak', vim.lsp.buf.hover, {})
-				vim.keymap.set('n', '<leader>p', vim.lsp.buf.format, {})
+				vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, {})
+				vim.keymap.set("n", "<leader>gi", vim.lsp.buf.implementation, {})
+				vim.keymap.set("n", "<leader>ar", vim.lsp.buf.rename, {})
+				vim.keymap.set("n", "<leader>aw", vim.lsp.buf.code_action, {})
+				vim.keymap.set("n", "<leader>ak", vim.lsp.buf.hover, {})
 				vim.api.nvim_exec([[ autocmd CursorHold * lua vim.lsp.buf.hover()]], false)
 			end
 
-
 			require("lspconfig").tsserver.setup({
-				on_attach = on_attach
+				on_attach = on_attach,
 			})
-
 
 			require("lspconfig").lua_ls.setup({
-				on_attach = on_attach
+				on_attach = on_attach,
 			})
 
-
 			-- require("lspconfig").prettierd.setup({})
-		end
+		end,
 	},
 	{
 		"nvim-neo-tree/neo-tree.nvim",
@@ -217,14 +242,13 @@ require("lazy").setup({
 			"MunifTanjim/nui.nvim",
 		},
 		config = function()
-			vim.keymap.set('n', '<leader>n', ':Neotree toggle<CR>', {})
-		end
+			vim.keymap.set("n", "<leader>n", ":Neotree toggle<CR>", {})
+		end,
 	},
 	{
 		"folke/trouble.nvim",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
-		opts = {}
-
+		opts = {},
 	},
 	{
 		"folke/tokyonight.nvim",
@@ -242,19 +266,17 @@ require("lazy").setup({
 		},
 		opts = {
 			workspaces = {
-				-- vim.keymap.set('n', '<leader>p', vim.lsp.buf.format, buf)
 				{
 					name = "personal",
 					path = "~/vaults/personal",
 				},
 			},
 		},
-	}
-
+	},
 })
 
 -- settings
-vim.cmd [[colorscheme tokyonight-storm]]
+vim.cmd([[colorscheme tokyonight-storm]])
 vim.opt.number = true
 vim.opt.termguicolors = true
 vim.opt.cursorline = true
