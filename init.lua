@@ -144,12 +144,22 @@ require("lazy").setup({
 	},
 	{
 		"nvim-neotest/neotest",
-		opts = { adapters = { "neotest-plenary", "neotest-jest", "neotest-playwright" } },
+		dependencies = { "nvim-neotest/neotest-plenary", 'nvim-neotest/neotest-jest', "thenbe/neotest-playwright"  },
+		opts = { adapters = { "neotest-plenary", 'neotest-jest', "neotest-playwright" } },
 		status = { virtual_text = true },
 		output = { open_on_run = true },
 		config = function()
-			require("neotest").setup({})
+			require("neotest").setup({
+
+				adapters = {
+					require('neotest-jest')({
+						jestCommand = require('neotest-jest.jest-util').getJestCommand(vim.fn
+							.expand '%:p:h') .. ' --watch',
+					}) }
+
+			})
 			vim.keymap.set('n', '<leader>tf', ':Neotest run file<CR>', {})
+			vim.keymap.set('n', '<leader>tn', ':Neotest run run<CR>', {})
 		end
 	},
 	{
@@ -180,6 +190,7 @@ require("lazy").setup({
 				vim.keymap.set('n', '<leader>ar', vim.lsp.buf.rename, {})
 				vim.keymap.set('n', '<leader>aw', vim.lsp.buf.code_action, {})
 				vim.keymap.set('n', '<leader>ak', vim.lsp.buf.hover, {})
+				vim.keymap.set('n', '<leader>p', vim.lsp.buf.format, {})
 				vim.api.nvim_exec([[ autocmd CursorHold * lua vim.lsp.buf.hover()]], false)
 			end
 
@@ -194,7 +205,7 @@ require("lazy").setup({
 			})
 
 
-			require("lspconfig").prettierd.setup({})
+			-- require("lspconfig").prettierd.setup({})
 		end
 	},
 	{
