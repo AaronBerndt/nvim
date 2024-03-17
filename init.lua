@@ -42,6 +42,7 @@ require("lazy").setup({
 					lua = { "stylua" },
 					python = { "isort", "black" },
 					typescript = { { "prettierd" } },
+					json = { { "prettierd" } },
 					typescriptreact = { { "prettierd" } },
 					javascript = { { "prettierd" } },
 				},
@@ -196,7 +197,6 @@ require("lazy").setup({
 		opts = {},
 		dependencies = {
 			"MunifTanjim/nui.nvim",
-			"rcarriga/nvim-notify",
 		},
 	},
 	"VonHeikemen/lsp-zero.nvim",
@@ -213,8 +213,8 @@ require("lazy").setup({
 
 			on_attach = function(_, _)
 				-- local buf = { buffer = bufnr }
-				vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, {})
-				vim.keymap.set("n", "<leader>gi", vim.lsp.buf.implementation, {})
+				vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
+				vim.keymap.set("n", "gi", vim.lsp.buf.implementation, {})
 				vim.keymap.set("n", "<leader>ar", vim.lsp.buf.rename, {})
 				vim.keymap.set("n", "<leader>aw", vim.lsp.buf.code_action, {})
 				vim.keymap.set("n", "<leader>ak", vim.lsp.buf.hover, {})
@@ -228,8 +228,6 @@ require("lazy").setup({
 			require("lspconfig").lua_ls.setup({
 				on_attach = on_attach,
 			})
-
-			-- require("lspconfig").prettierd.setup({})
 		end,
 	},
 	{
@@ -283,6 +281,7 @@ vim.opt.cursorline = true
 -- keybindings
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
-vim.keymap.set("n", "<leader>ar", "")
-vim.keymap.set("n", "<leader>yy", ":TermExec direction='float' cmd='yarn run_dev' <CR>")
-vim.keymap.set("n", "<leader>ys", ":TermExec direction='float' cmd='yarn storybook' <CR>")
+vim.keymap.set("n", "<leader>r", "<Plug>(SubversiveSubstitute)")
+vim.keymap.set("n", "<leader>yy", ":TermExec direction='float' cmd='yarn run_dev' open=0 <CR>")
+vim.keymap.set("n", "<leader>ys", ":TermExec direction='float' cmd='yarn storybook' open=0 <CR>")
+vim.keymap.set("n", "<leader>`", ":ToggleTerm")
