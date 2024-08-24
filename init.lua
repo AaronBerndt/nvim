@@ -32,6 +32,11 @@ require("lazy").setup({
 		end,
 	},
 	{
+		"L3MON4D3/LuaSnip",
+		version = "v2.*", --
+		build = "make install_jsregexp",
+	},
+	{
 		"stevearc/conform.nvim",
 		opts = {},
 
@@ -172,7 +177,12 @@ require("lazy").setup({
 	},
 	{
 		"nvim-neotest/neotest",
-		dependencies = { "nvim-neotest/neotest-plenary", "nvim-neotest/neotest-jest", "thenbe/neotest-playwright" },
+		dependencies = {
+			"nvim-neotest/neotest-plenary",
+			"nvim-neotest/neotest-jest",
+			"thenbe/neotest-playwright",
+			"nvim-neotest/nvim-nio",
+		},
 		opts = { adapters = { "neotest-plenary", "neotest-jest", "neotest-playwright" } },
 		status = { virtual_text = true },
 		output = { open_on_run = true },
@@ -188,6 +198,8 @@ require("lazy").setup({
 			})
 			vim.keymap.set("n", "<leader>tf", ":Neotest run file<CR>", {})
 			vim.keymap.set("n", "<leader>tn", ":Neotest run run<CR>", {})
+			vim.keymap.set("n", "<leader>ta", ":Neotest attach<CR>", {})
+			vim.keymap.set("n", "<leader>ts", ":Neotest summary<CR>", {})
 		end,
 	},
 	{
@@ -207,7 +219,7 @@ require("lazy").setup({
 			local lsp_zero = require("lsp-zero")
 			require("mason").setup()
 			require("mason-lspconfig").setup({
-				ensure_installed = { "tsserver", "angularjs", "lua_ls" },
+				ensure_installed = { "tsserver", "lua_ls", "eslint", "html" },
 			})
 
 			on_attach = function(_, _)
@@ -221,6 +233,10 @@ require("lazy").setup({
 			end
 
 			require("lspconfig").tsserver.setup({
+				on_attach = on_attach,
+			})
+
+			require("lspconfig").eslint.setup({
 				on_attach = on_attach,
 			})
 
@@ -278,7 +294,6 @@ require("lazy").setup({
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-cmdline",
 			"saadparwaiz1/cmp_luasnip",
-			"L3MON4D3/LuaSnip",
 		},
 
 		config = function()
@@ -315,13 +330,103 @@ vim.cmd([[colorscheme tokyonight-storm]])
 vim.opt.number = true
 vim.opt.termguicolors = true
 vim.opt.cursorline = true
+vim.api.nvim_set_hl(0, "LineNr", { fg = "white" })
+
+function ZipnosisCommand()
+	require("telescope.builtin").find_files({ cwd = "~/gitstuff/zipnosis", prompt_title = "zipnosis" })
+end
+
+function ZipnosisGrepCommand()
+	require("telescope.builtin").live_grep({ cwd = "~/gitstuff/zipnosis", prompt_title = "zipnosis grep" })
+end
+
+function FlorenceGrepCommand()
+	require("telescope.builtin").live_grep({
+		cwd = "~/gitstuff/florence-fe/apps/virtual-care",
+		prompt_title = "florence grep",
+	})
+end
+
+function FlorenceCommand()
+	require("telescope.builtin").find_files({
+		cwd = "~/gitstuff/florence-fe/apps/virtual-care",
+		prompt_title = "florence",
+	})
+end
+
+function FindTest()
+	local fileName = vim.fn.expand("%:r")
+	local fileType = vim.fn.expand("%:e")
+	local newFilePath = fileName .. ".test." .. fileType
+
+	-- Uncomment and modify the following blocks if needed
+
+	-- if string.match(fileName, 'test') then
+	--   local newFileName = string.gsub(fileName, '.test', '')
+	--   newFilePath = newFileName .. '.' .. fileType
+	--   print(newFilePath)
+	-- end
+
+	-- if string.match(fileName, 'stories') then
+	--   local newFileName = string.gsub(fileName, 'stories', 'test')
+	--   newFilePath = newFileName .. '.' .. fileType
+	-- end
+
+	vim.cmd("vsplit " .. newFilePath)
+end
+
+function FindExtra()
+	local fileType = vim.fn.expand("%:e")
+	local fileName = vim.fn.expand("%:r")
+	local newFilePath = fileName .. ".stories." .. fileType
+
+	-- Uncomment and modify the following blocks if needed
+
+	-- if string.match(fileName, 'stories') then
+	--   local newFileName = string.gsub(fileName, '.stories', '')
+	--   print(newFileName)
+	--   newFilePath = newFileName .. '.' .. fileType
+	-- end
+
+	-- if string.match(fileName, 'test') then
+	--   local newFileName = string.gsub(fileName, 'test', 'stories')
+	--   newFilePath = newFileName .. '.' .. fileType
+	-- end
+
+	vim.cmd("vsplit " .. newFilePath)
+end
 
 -- keybindings
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("n", "<leader>r", "<Plug>(SubversiveSubstitute)")
-vim.keymap.set("n", "<leader>yy", ":TermExec direction='float' cmd='yarn run_dev' open=0 <CR>")
-vim.keymap.set("n", "<leader>ys", ":TermExec direction='float' cmd='yarn storybook' open=0 <CR>")
-vim.keymap.set("n", "<leader>`", ":ToggleTerm direction='float' <CR>")
+vim.keymap.set(
+	"n",
+	"<leader>yy",
+	":5TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/ &&  nx dev virtual-care' open=0 <CR>"
+)
+vim.keymap.set(
+	"n",
+	"<leader>yl",
+	":5TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/ &&  nx lint virtual-care' open=1 <CR>"
+)
+
+vim.keymap.set(
+	"n",
+	"<leader>ys",
+	":2TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/ &&  nx storybook virtual-care' open=0 <CR>"
+)
+vim.keymap.set(
+	"n",
+	"<leader>yn",
+	":3TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx nginx' open=0 <CR>"
+)
+vim.keymap.set("n", "<leader>`", ":4ToggleTerm direction='float' <CR>")
 vim.keymap.set("n", "<c-l>", ":wincmd l<CR>")
 vim.keymap.set("n", "<c-h>", ":wincmd h<CR>")
+vim.keymap.set("n", "to", ":lua FindTest()<CR>")
+vim.keymap.set("n", "te", ":lua FindExtra()<CR>")
+vim.keymap.set("n", "<leader>fz", ":lua ZipnosisCommand()<CR>")
+vim.keymap.set("n", "<leader>gz", ":lua ZipnosisGrepCommand()<CR>")
+vim.keymap.set("n", "<leader>gf", ":lua FlorenceGrepCommand()<CR>")
+vim.keymap.set("n", "<leader>fr", ":lua FlorenceCommand()<CR>")
