@@ -354,46 +354,50 @@ function FlorenceCommand()
 	})
 end
 
-function FindTest()
-	local fileName = vim.fn.expand("%:r")
+function FindModifiedFile(suffix)
+	-- Get the base name of the current file (without path)
+	local fileName = vim.fn.expand("%:t:r")
+	-- Get the extension of the current file
 	local fileType = vim.fn.expand("%:e")
-	local newFilePath = fileName .. ".test." .. fileType
 
-	-- Uncomment and modify the following blocks if needed
+	-- Determine if the file already contains the suffix
+	local newFileName
+	if fileName:sub(-#suffix) == suffix then
+		-- If the file contains the suffix, remove it and search for the original file
+		newFileName = fileName:sub(1, -#suffix - 1) .. "." .. fileType
+	else
+		-- If the file does not contain the suffix, add the suffix and search for the modified file
+		newFileName = fileName .. suffix .. "." .. fileType
+	end
 
-	-- if string.match(fileName, 'test') then
-	--   local newFileName = string.gsub(fileName, '.test', '')
-	--   newFilePath = newFileName .. '.' .. fileType
-	--   print(newFilePath)
-	-- end
+	-- Use the 'rg' command to search for the file in the current directory
+	local cmd = "rg --files | grep '" .. newFileName .. "'"
+	local handle = io.popen(cmd)
+	local result = handle:read("*a")
+	handle:close()
 
-	-- if string.match(fileName, 'stories') then
-	--   local newFileName = string.gsub(fileName, 'stories', 'test')
-	--   newFilePath = newFileName .. '.' .. fileType
-	-- end
+	-- Split the result into lines (file paths)
+	local files = {}
+	for file in result:gmatch("[^\r\n]+") do
+		table.insert(files, file)
+	end
 
-	vim.cmd("vsplit " .. newFilePath)
+	-- If no files were found, print a message and return
+	if #files == 0 then
+		print("No file found for '" .. newFileName .. "'")
+		return
+	end
+
+	-- Open the first file found in a vertical split
+	vim.cmd("vsplit " .. files[1])
 end
 
-function FindExtra()
-	local fileType = vim.fn.expand("%:e")
-	local fileName = vim.fn.expand("%:r")
-	local newFilePath = fileName .. ".stories." .. fileType
+function FindTest()
+	FindModifiedFile(".test")
+end
 
-	-- Uncomment and modify the following blocks if needed
-
-	-- if string.match(fileName, 'stories') then
-	--   local newFileName = string.gsub(fileName, '.stories', '')
-	--   print(newFileName)
-	--   newFilePath = newFileName .. '.' .. fileType
-	-- end
-
-	-- if string.match(fileName, 'test') then
-	--   local newFileName = string.gsub(fileName, 'test', 'stories')
-	--   newFilePath = newFileName .. '.' .. fileType
-	-- end
-
-	vim.cmd("vsplit " .. newFilePath)
+function FindStories()
+	FindModifiedFile(".stories")
 end
 
 -- keybindings
@@ -425,7 +429,7 @@ vim.keymap.set("n", "<leader>`", ":4ToggleTerm direction='float' <CR>")
 vim.keymap.set("n", "<c-l>", ":wincmd l<CR>")
 vim.keymap.set("n", "<c-h>", ":wincmd h<CR>")
 vim.keymap.set("n", "to", ":lua FindTest()<CR>")
-vim.keymap.set("n", "te", ":lua FindExtra()<CR>")
+vim.keymap.set("n", "te", ":lua FindStories()<CR>")
 vim.keymap.set("n", "<leader>fz", ":lua ZipnosisCommand()<CR>")
 vim.keymap.set("n", "<leader>gz", ":lua ZipnosisGrepCommand()<CR>")
 vim.keymap.set("n", "<leader>gf", ":lua FlorenceGrepCommand()<CR>")
