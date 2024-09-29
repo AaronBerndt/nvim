@@ -219,7 +219,7 @@ require("lazy").setup({
 			local lsp_zero = require("lsp-zero")
 			require("mason").setup()
 			require("mason-lspconfig").setup({
-				ensure_installed = { "tsserver", "lua_ls", "eslint", "html" },
+				ensure_installed = { "ts_ls", "lua_ls", "eslint", "html" },
 			})
 
 			on_attach = function(_, _)
@@ -232,7 +232,7 @@ require("lazy").setup({
 				vim.api.nvim_exec([[ autocmd CursorHold * lua vim.lsp.buf.hover()]], false)
 			end
 
-			require("lspconfig").tsserver.setup({
+			require("lspconfig").ts_ls.setup({
 				on_attach = on_attach,
 			})
 
@@ -271,7 +271,7 @@ require("lazy").setup({
 	{
 		"epwalsh/obsidian.nvim",
 		version = "*",
-		lazy = true,
+		lazy = false,
 		ft = "markdown",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
@@ -279,8 +279,8 @@ require("lazy").setup({
 		opts = {
 			workspaces = {
 				{
-					name = "personal",
-					path = "~/vaults/personal",
+					name = "D&D",
+					path = "~/gitstuff/obsidian/",
 				},
 			},
 		},
@@ -319,6 +319,16 @@ require("lazy").setup({
 					{ name = "path" },
 					{ name = "cmdline" },
 					{ name = "luasnip" },
+					{
+						name = "spell",
+						option = {
+							keep_all_entries = false,
+							enable_in_context = function()
+								return require("cmp.config.context").in_treesitter_capture("spell")
+							end,
+							preselect_correct_word = true,
+						},
+					},
 				},
 			})
 		end,
@@ -331,6 +341,31 @@ vim.opt.number = true
 vim.opt.termguicolors = true
 vim.opt.cursorline = true
 vim.api.nvim_set_hl(0, "LineNr", { fg = "white" })
+-- Set highlight colors (overridden by colorscheme, hence after)
+vim.api.nvim_set_hl(0, "LineNr", { fg = "#6c7086" })
+vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#cdd6f4", bold = true })
+vim.api.nvim_set_hl(0, "LineNrAbove", { fg = "#eba0ac" })
+vim.api.nvim_set_hl(0, "LineNrBelow", { fg = "#94e2d5" })
+
+-- Set line number to be a bit darker
+vim.api.nvim_set_hl(0, "Status_LineNr", { fg = "#6c7086" })
+
+-- Color background the same as normal but color text light grey
+-- Use 'Vertical Line Extension' ⏐ unicode U+23d0
+vim.api.nvim_set_hl(0, "Status_DivLine", { bg = "#1e1e2e", fg = "#313244" })
+
+-- Set number and relativenumber to use in 'statuscolumn'
+vim.opt.number = true
+vim.opt.relativenumber = true
+
+-- Highlight current line
+vim.opt.cursorline = true
+
+-- Set signcolumn to always show and limit to 1 character
+vim.opt.signcolumn = "yes:1"
+
+-- statuscolumn: %C fold column, %s sign column, %l line number, %r relative line number, %- justify spacing, . limit
+vim.o.statuscolumn = "%C%s%#Status_LineNr#%3.3l%* %-2.2r%#Status_DivLine#⏐%* "
 
 function ZipnosisCommand()
 	require("telescope.builtin").find_files({ cwd = "~/gitstuff/zipnosis", prompt_title = "zipnosis" })
@@ -400,7 +435,18 @@ function FindStories()
 	FindModifiedFile(".stories")
 end
 
--- keybindings
+vim.api.nvim_create_autocmd("TextYankPost", {
+	group = vim.api.nvim_create_augroup("highlight_yank", {}),
+	desc = "Hightlight selection on yank",
+	pattern = "*",
+	callback = function()
+		vim.highlight.on_yank({ higroup = "IncSearch", timeout = 500 })
+	end,
+})
+
+vim.g.mapleader = " "
+vim.opt.spell = true
+vim.opt.spelllang = { "en_us" }
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("n", "<leader>r", "<Plug>(SubversiveSubstitute)")
@@ -414,7 +460,6 @@ vim.keymap.set(
 	"<leader>yl",
 	":5TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/ &&  nx lint virtual-care' open=1 <CR>"
 )
-
 vim.keymap.set(
 	"n",
 	"<leader>ys",
