@@ -13,6 +13,8 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 require("lazy").setup({
 	"folke/which-key.nvim",
+	"kchmck/vim-coffee-script",
+	"rest-nvim/rest.nvim",
 	"folke/neodev.nvim",
 	"shaunsingh/nord.nvim",
 	"github/copilot.vim",
@@ -21,6 +23,30 @@ require("lazy").setup({
 	{
 		"folke/neoconf.nvim",
 		cmd = "Neoconf",
+	},
+	{
+		"olimorris/codecompanion.nvim",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"nvim-treesitter/nvim-treesitter",
+			"hrsh7th/nvim-cmp", -- Optional: For using slash commands and variables in the chat buffer
+			"nvim-telescope/telescope.nvim", -- Optional: For using slash commands
+			{ "stevearc/dressing.nvim", opts = {} }, -- Optional: Improves `vim.ui.select`
+		},
+		config = function()
+			require("codecompanion").setup({
+				strategies = {
+					chat = {
+						adapter = "copilot",
+					},
+					agent = {
+						adapter = "copilot",
+					},
+				},
+			})
+			vim.keymap.set("n", "<leader>cc", ":CodeCompanionChat<CR>", {})
+			vim.keymap.set("n", "<leader>ca", ":CodeCompanion<CR>", {})
+		end,
 	},
 
 	{
@@ -243,6 +269,14 @@ require("lazy").setup({
 			require("lspconfig").lua_ls.setup({
 				on_attach = on_attach,
 			})
+
+			require("lspconfig").angularls.setup({
+				on_attach = on_attach,
+			})
+
+			require("lspconfig").coffeesense.setup({
+				on_attach = on_attach,
+			})
 		end,
 	},
 	{
@@ -338,35 +372,12 @@ require("lazy").setup({
 -- settings
 vim.cmd([[colorscheme tokyonight-storm]])
 vim.opt.number = true
+vim.opt.clipboard = "unnamed"
 vim.opt.termguicolors = true
 vim.opt.cursorline = true
 vim.api.nvim_set_hl(0, "LineNr", { fg = "white" })
--- Set highlight colors (overridden by colorscheme, hence after)
-vim.api.nvim_set_hl(0, "LineNr", { fg = "#6c7086" })
-vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#cdd6f4", bold = true })
-vim.api.nvim_set_hl(0, "LineNrAbove", { fg = "#eba0ac" })
-vim.api.nvim_set_hl(0, "LineNrBelow", { fg = "#94e2d5" })
 
--- Set line number to be a bit darker
-vim.api.nvim_set_hl(0, "Status_LineNr", { fg = "#6c7086" })
-
--- Color background the same as normal but color text light grey
--- Use 'Vertical Line Extension' ⏐ unicode U+23d0
-vim.api.nvim_set_hl(0, "Status_DivLine", { bg = "#1e1e2e", fg = "#313244" })
-
--- Set number and relativenumber to use in 'statuscolumn'
-vim.opt.number = true
-vim.opt.relativenumber = true
-
--- Highlight current line
-vim.opt.cursorline = true
-
--- Set signcolumn to always show and limit to 1 character
-vim.opt.signcolumn = "yes:1"
-
--- statuscolumn: %C fold column, %s sign column, %l line number, %r relative line number, %- justify spacing, . limit
-vim.o.statuscolumn = "%C%s%#Status_LineNr#%3.3l%* %-2.2r%#Status_DivLine#⏐%* "
-
+-- Functions
 function ZipnosisCommand()
 	require("telescope.builtin").find_files({ cwd = "~/gitstuff/zipnosis", prompt_title = "zipnosis" })
 end
@@ -447,6 +458,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 vim.g.mapleader = " "
 vim.opt.spell = true
 vim.opt.spelllang = { "en_us" }
+-- Keymaps
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("n", "<leader>r", "<Plug>(SubversiveSubstitute)")
@@ -470,6 +482,17 @@ vim.keymap.set(
 	"<leader>yn",
 	":3TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx nginx' open=0 <CR>"
 )
+vim.keymap.set(
+	"n",
+	"<leader>yt",
+	":7TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ &&  nx test' open=1 <CR>"
+)
+vim.keymap.set(
+	"n",
+	"<leader>yr",
+	":8TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ &&  nx test-storybook' open=1 <CR>"
+)
+
 vim.keymap.set("n", "<leader>`", ":4ToggleTerm direction='float' <CR>")
 vim.keymap.set("n", "<c-l>", ":wincmd l<CR>")
 vim.keymap.set("n", "<c-h>", ":wincmd h<CR>")
