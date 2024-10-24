@@ -213,15 +213,15 @@ require("lazy").setup({
 		status = { virtual_text = true },
 		output = { open_on_run = true },
 		config = function()
-			-- require("neotest").setup({
-			--
-			-- 	adapters = {
-			-- 		require("neotest-jest")({
-			-- 			jestCommand = require("neotest-jest.jest-util").getJestCommand(vim.fn.expand("%:p:h"))
-			-- 				.. " --watch",
-			-- 		}),
-			-- 	},
-			-- })
+			require("neotest").setup({
+
+				adapters = {
+					require("neotest-jest")({
+						jest_command = "jest --watch",
+					}),
+				},
+			})
+
 			vim.keymap.set("n", "<leader>tf", ":Neotest run file<CR>", {})
 			vim.keymap.set("n", "<leader>tn", ":Neotest run run<CR>", {})
 			vim.keymap.set("n", "<leader>ta", ":Neotest attach<CR>", {})
