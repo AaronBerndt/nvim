@@ -212,6 +212,13 @@ require("lazy").setup({
 		opts = { adapters = { "neotest-plenary", "neotest-jest", "neotest-playwright" } },
 		status = { virtual_text = true },
 		output = { open_on_run = true },
+		estConfigFile = function(file)
+			if string.find(file, "/packages/") then
+				return string.match(file, "(.-/[^/]+/)src") .. "jest.config.ts"
+			end
+
+			return vim.fn.getcwd() .. "/jest.config.ts"
+		end,
 		config = function()
 			require("neotest").setup({
 
@@ -262,6 +269,10 @@ require("lazy").setup({
 				on_attach = on_attach,
 			})
 
+			require("lspconfig").html.setup({
+				on_attach = on_attach,
+			})
+
 			require("lspconfig").eslint.setup({
 				on_attach = on_attach,
 			})
@@ -305,7 +316,7 @@ require("lazy").setup({
 	{
 		"epwalsh/obsidian.nvim",
 		version = "*",
-		lazy = false,
+		lazy = true,
 		ft = "markdown",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
@@ -313,8 +324,8 @@ require("lazy").setup({
 		opts = {
 			workspaces = {
 				{
-					name = "D&D",
-					path = "~/gitstuff/obsidian/",
+					name = "personal",
+					path = "~/gitstuff/obsidian",
 				},
 			},
 		},
@@ -353,16 +364,6 @@ require("lazy").setup({
 					{ name = "path" },
 					{ name = "cmdline" },
 					{ name = "luasnip" },
-					{
-						name = "spell",
-						option = {
-							keep_all_entries = false,
-							enable_in_context = function()
-								return require("cmp.config.context").in_treesitter_capture("spell")
-							end,
-							preselect_correct_word = true,
-						},
-					},
 				},
 			})
 		end,
@@ -370,12 +371,16 @@ require("lazy").setup({
 })
 
 -- settings
+vim.g.mapleader = " "
+vim.opt.spell = true
+vim.opt.spelllang = { "en_us" }
 vim.cmd([[colorscheme tokyonight-storm]])
 vim.opt.number = true
 vim.opt.clipboard = "unnamed"
 vim.opt.termguicolors = true
 vim.opt.cursorline = true
 vim.api.nvim_set_hl(0, "LineNr", { fg = "white" })
+vim.opt.conceallevel = 2
 
 -- Functions
 function ZipnosisCommand()
@@ -383,7 +388,7 @@ function ZipnosisCommand()
 end
 
 function ZipnosisGrepCommand()
-	require("telescope.builtin").live_grep({ cwd = "~/gitstuff/zipnosis", prompt_title = "zipnosis grep" })
+	require("telescope.builtin").live_grep({ cwd = "~/gitstuff/florence-fe/zipnosis", prompt_title = "zipnosis grep" })
 end
 
 function FlorenceGrepCommand()
@@ -400,6 +405,7 @@ function FlorenceCommand()
 	})
 end
 
+-- keybindings
 function FindModifiedFile(suffix)
 	-- Get the base name of the current file (without path)
 	local fileName = vim.fn.expand("%:t:r")
@@ -455,50 +461,44 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	end,
 })
 
-vim.g.mapleader = " "
-vim.opt.spell = true
-vim.opt.spelllang = { "en_us" }
 -- Keymaps
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
-vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("n", "<leader>r", "<Plug>(SubversiveSubstitute)")
 vim.keymap.set(
 	"n",
 	"<leader>yy",
-	":5TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/ &&  nx dev virtual-care' open=0 <CR>"
-)
-vim.keymap.set(
-	"n",
-	"<leader>yl",
-	":5TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/ &&  nx lint virtual-care' open=1 <CR>"
+	":1TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx dev' open=0 <CR>"
 )
 vim.keymap.set(
 	"n",
 	"<leader>ys",
-	":2TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/ &&  nx storybook virtual-care' open=0 <CR>"
+	":2TermExec direction='float' cmd='cd ./apps/virtual-care && nx storybook' open=0 <CR>"
 )
 vim.keymap.set(
 	"n",
 	"<leader>yn",
 	":3TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx nginx' open=0 <CR>"
 )
+vim.keymap.set("n", "<leader>`", ":ToggleTerm direction='float' <CR>")
+vim.keymap.set(
+	"n",
+	"<leader>yn",
+	":4TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx nginx' open=0 <CR>"
+)
 vim.keymap.set(
 	"n",
 	"<leader>yt",
-	":7TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ &&  nx test' open=1 <CR>"
+	":5TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ &&  nx test' open=1 <CR>"
 )
 vim.keymap.set(
 	"n",
 	"<leader>yr",
-	":8TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ &&  nx test-storybook' open=1 <CR>"
+	":6TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ &&  nx test-storybook' open=1 <CR>"
 )
 
 vim.keymap.set("n", "<leader>`", ":4ToggleTerm direction='float' <CR>")
 vim.keymap.set("n", "<c-l>", ":wincmd l<CR>")
 vim.keymap.set("n", "<c-h>", ":wincmd h<CR>")
 vim.keymap.set("n", "to", ":lua FindTest()<CR>")
-vim.keymap.set("n", "te", ":lua FindStories()<CR>")
+vim.keymap.set("n", "te", ":lua FindExtra()<CR>")
 vim.keymap.set("n", "<leader>fz", ":lua ZipnosisCommand()<CR>")
-vim.keymap.set("n", "<leader>gz", ":lua ZipnosisGrepCommand()<CR>")
-vim.keymap.set("n", "<leader>gf", ":lua FlorenceGrepCommand()<CR>")
 vim.keymap.set("n", "<leader>fr", ":lua FlorenceCommand()<CR>")
