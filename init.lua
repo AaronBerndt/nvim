@@ -388,19 +388,19 @@ function ZipnosisCommand()
 end
 
 function ZipnosisGrepCommand()
-	require("telescope.builtin").live_grep({ cwd = "~/gitstuff/florence-fe/zipnosis", prompt_title = "zipnosis grep" })
+	require("telescope.builtin").live_grep({ cwd = "~/gitstuff/zipnosis/", prompt_title = "zipnosis grep" })
 end
 
 function FlorenceGrepCommand()
 	require("telescope.builtin").live_grep({
-		cwd = "~/gitstuff/florence-fe/apps/virtual-care",
+		cwd = "~/gitstuff/florence-fe",
 		prompt_title = "florence grep",
 	})
 end
 
 function FlorenceCommand()
 	require("telescope.builtin").find_files({
-		cwd = "~/gitstuff/florence-fe/apps/virtual-care",
+		cwd = "~/gitstuff/florence-fe",
 		prompt_title = "florence",
 	})
 end
@@ -471,7 +471,7 @@ vim.keymap.set(
 vim.keymap.set(
 	"n",
 	"<leader>ys",
-	":2TermExec direction='float' cmd='cd ./apps/virtual-care && nx storybook' open=0 <CR>"
+	":2TermExec direction='float' cmd='cd ~/gitstuff/florence-fe && nx storybook virtual-care' open=0 <CR>"
 )
 vim.keymap.set(
 	"n",
@@ -502,3 +502,4 @@ vim.keymap.set("n", "to", ":lua FindTest()<CR>")
 vim.keymap.set("n", "te", ":lua FindExtra()<CR>")
 vim.keymap.set("n", "<leader>fz", ":lua ZipnosisCommand()<CR>")
 vim.keymap.set("n", "<leader>fr", ":lua FlorenceCommand()<CR>")
+vim.keymap.set("n", "<leader>gf", ":lua FlorenceGrepCommand()<CR>")
