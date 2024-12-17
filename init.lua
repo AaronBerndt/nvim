@@ -254,7 +254,7 @@ require("lazy").setup({
 			local lsp_zero = require("lsp-zero")
 			require("mason").setup()
 			require("mason-lspconfig").setup({
-				ensure_installed = { "ts_ls", "lua_ls", "eslint", "html" },
+				ensure_installed = { "ts_ls", "lua_ls", "eslint", "html","solargraph","coffeesense","angularls" },
 			})
 
 			on_attach = function(_, _)
