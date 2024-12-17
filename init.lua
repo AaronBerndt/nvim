@@ -14,12 +14,14 @@ vim.g.mapleader = " "
 require("lazy").setup({
 	"folke/which-key.nvim",
 	"kchmck/vim-coffee-script",
-	"rest-nvim/rest.nvim",
 	"folke/neodev.nvim",
 	"shaunsingh/nord.nvim",
+	"justinmk/vim-sneak",
 	"github/copilot.vim",
 	"metakirby5/codi.vim",
 	"svermeulen/vim-subversive",
+	{ "glacambre/firenvim", build = ":call firenvim#install(0)" },
+	{ "mistweaverco/kulala.nvim", opts = {} },
 	{
 		"folke/neoconf.nvim",
 		cmd = "Neoconf",
@@ -288,6 +290,10 @@ require("lazy").setup({
 			require("lspconfig").coffeesense.setup({
 				on_attach = on_attach,
 			})
+
+			require("lspconfig").solargraph.setup({
+				on_attach = on_attach,
+			})
 		end,
 	},
 	{
@@ -330,6 +336,16 @@ require("lazy").setup({
 			},
 		},
 	},
+	{
+		"iamcco/markdown-preview.nvim",
+		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+		build = "cd app && yarn install",
+		init = function()
+			vim.g.mkdp_filetypes = { "markdown" }
+		end,
+		ft = { "markdown" },
+	},
+
 	{
 		"hrsh7th/nvim-cmp",
 		dependencies = {
@@ -409,21 +425,37 @@ end
 function FindModifiedFile(suffix)
 	-- Get the base name of the current file (without path)
 	local fileName = vim.fn.expand("%:t:r")
-	-- Get the extension of the current file
-	local fileType = vim.fn.expand("%:e")
+	-- Get the full extension of the current file
+	local fullExt = vim.fn.expand("%:e")
+	local baseExt = vim.fn.expand("%:r:e") -- Extension before the last dot
 
-	-- Determine if the file already contains the suffix
-	local newFileName
-	if fileName:sub(-#suffix) == suffix then
-		-- If the file contains the suffix, remove it and search for the original file
-		newFileName = fileName:sub(1, -#suffix - 1) .. "." .. fileType
+	-- Special handling for index.html.haml <-> component.js.coffee
+	local targetFileName
+	if fullExt == "haml" and baseExt == "html" and fileName == "index" then
+		-- Convert index.html.haml to component.js.coffee
+		targetFileName = "component.js.coffee"
+	elseif fullExt == "coffee" and baseExt == "js" and fileName == "component" then
+		-- Convert component.js.coffee to index.html.haml
+		targetFileName = "index.html.haml"
+	elseif (fullExt == "coffee" or fullExt == "haml") and suffix == ".stories" then
+		-- Exclude adding `.stories` for .coffee or .haml files
+		targetFileName = fileName .. "." .. fullExt
+	elseif (fullExt == "coffee" or fullExt == "haml") and suffix == ".test" then
+		-- Convert `.test` to `.spec` for .coffee or .haml files
+		targetFileName = fileName .. ".spec." .. fullExt
 	else
-		-- If the file does not contain the suffix, add the suffix and search for the modified file
-		newFileName = fileName .. suffix .. "." .. fileType
+		-- Handle generic suffix logic
+		if fileName:sub(-#suffix) == suffix then
+			-- If the file contains the suffix, remove it and search for the original file
+			targetFileName = fileName:sub(1, -#suffix - 1) .. "." .. fullExt
+		else
+			-- If the file does not contain the suffix, add it
+			targetFileName = fileName .. suffix .. "." .. fullExt
+		end
 	end
 
 	-- Use the 'rg' command to search for the file in the current directory
-	local cmd = "rg --files | grep '" .. newFileName .. "'"
+	local cmd = "rg --files | grep '" .. targetFileName .. "'"
 	local handle = io.popen(cmd)
 	local result = handle:read("*a")
 	handle:close()
@@ -436,7 +468,7 @@ function FindModifiedFile(suffix)
 
 	-- If no files were found, print a message and return
 	if #files == 0 then
-		print("No file found for '" .. newFileName .. "'")
+		print("No file found for '" .. targetFileName .. "'")
 		return
 	end
 
@@ -494,6 +526,11 @@ vim.keymap.set(
 	"<leader>yr",
 	":6TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ &&  nx test-storybook' open=1 <CR>"
 )
+vim.keymap.set(
+	"n",
+	"<leader>yl",
+	":7TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ &&  nx lint' open=1 <CR>"
+)
 
 vim.keymap.set("n", "<leader>`", ":4ToggleTerm direction='float' <CR>")
 vim.keymap.set("n", "<c-l>", ":wincmd l<CR>")
@@ -503,3 +540,11 @@ vim.keymap.set("n", "te", ":lua FindStories()<CR>")
 vim.keymap.set("n", "<leader>fz", ":lua ZipnosisCommand()<CR>")
 vim.keymap.set("n", "<leader>fr", ":lua FlorenceCommand()<CR>")
 vim.keymap.set("n", "<leader>gf", ":lua FlorenceGrepCommand()<CR>")
+vim.keymap.set("n", "<leader>gz", ":lua ZipnosisGrepCommand()<CR>")
+vim.api.nvim_buf_set_keymap(
+	0,
+	"n",
+	"<CR>",
+	"<cmd>lua require('kulala').run()<cr>",
+	{ noremap = true, silent = true, desc = "Execute the request" }
+)
