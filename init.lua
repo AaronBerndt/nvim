@@ -20,7 +20,7 @@ require("lazy").setup({
 	"github/copilot.vim",
 	"metakirby5/codi.vim",
 	"svermeulen/vim-subversive",
-	{ "glacambre/firenvim", build = ":call firenvim#install(0)" },
+	-- { "glacambre/firenvim", build = ":call firenvim#install(0)" },
 	{
 		"ThePrimeagen/harpoon",
 		branch = "harpoon2",
@@ -297,6 +297,44 @@ require("lazy").setup({
 		dependencies = {
 			"MunifTanjim/nui.nvim",
 		},
+		config = function()
+			local noice = require("noice")
+			function OpenFileInVsplitNoice()
+				-- Define the file paths
+				local files = {
+					"~/.config/nvim/init.lua",
+					"~/.nvimrc",
+				}
+
+				-- Format the options for Noice's selection menu
+				local options = {}
+				for i, file in ipairs(files) do
+					table.insert(options, {
+						text = i .. ": " .. file,
+						action = function()
+							vim.cmd("vsplit " .. file)
+						end,
+					})
+				end
+
+				-- Show the Noice selection menu
+				noice.menu({
+					title = "Select a File",
+					items = options,
+					on_cancel = function()
+						print("File selection canceled.")
+					end,
+				})
+			end
+
+			-- Map the function to a keybinding
+			vim.api.nvim_set_keymap(
+				"n",
+				"<leader>m",
+				":lua OpenFileInVsplitNoice()<CR>",
+				{ noremap = true, silent = true }
+			)
+		end,
 	},
 	"VonHeikemen/lsp-zero.nvim",
 	{
@@ -307,7 +345,7 @@ require("lazy").setup({
 			local lsp_zero = require("lsp-zero")
 			require("mason").setup()
 			require("mason-lspconfig").setup({
-				ensure_installed = { "ts_ls", "lua_ls", "eslint", "html", "solargraph", "coffeesense", "angularls" },
+				ensure_installed = { "ts_ls", "lua_ls", "eslint", "html", "solargraph", "angularls" },
 			})
 
 			on_attach = function(_, _)
@@ -594,6 +632,7 @@ vim.keymap.set("n", "<leader>fz", ":lua ZipnosisCommand()<CR>")
 vim.keymap.set("n", "<leader>fr", ":lua FlorenceCommand()<CR>")
 vim.keymap.set("n", "<leader>gf", ":lua FlorenceGrepCommand()<CR>")
 vim.keymap.set("n", "<leader>gz", ":lua ZipnosisGrepCommand()<CR>")
+
 vim.api.nvim_buf_set_keymap(
 	0,
 	"n",
