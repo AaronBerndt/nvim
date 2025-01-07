@@ -78,10 +78,14 @@ require("lazy").setup({
 				formatters_by_ft = {
 					lua = { "stylua" },
 					python = { "isort", "black" },
-					typescript = { { "prettierd" } },
-					json = { { "prettierd" } },
-					typescriptreact = { { "prettierd" } },
-					javascript = { { "prettierd" } },
+					typescript = {
+						"prettierd",
+					},
+					json = { "prettierd" },
+					typescriptreact = {
+						"prettierd",
+					},
+					javascript = { "prettierd" },
 				},
 			})
 
@@ -171,14 +175,22 @@ require("lazy").setup({
 				},
 				sections = {
 					lualine_a = {
-						{ "mode", separator = { left = "" }, right_padding = 2 },
+						{
+							"mode",
+							separator = { left = "" },
+							right_padding = 2,
+						},
 					},
 					lualine_b = { "filename", "branch" },
 					lualine_c = { "fileformat" },
 					lualine_x = {},
 					lualine_y = { "filetype", "progress" },
 					lualine_z = {
-						{ "location", separator = { right = "" }, left_padding = 2 },
+						{
+							"location",
+							separator = { right = "" },
+							left_padding = 2,
+						},
 					},
 				},
 				inactive_sections = {
@@ -264,7 +276,13 @@ require("lazy").setup({
 			"thenbe/neotest-playwright",
 			"nvim-neotest/nvim-nio",
 		},
-		opts = { adapters = { "neotest-plenary", "neotest-jest", "neotest-playwright" } },
+		opts = {
+			adapters = {
+				"neotest-plenary",
+				"neotest-jest",
+				"neotest-playwright",
+			},
+		},
 		status = { virtual_text = true },
 		output = { open_on_run = true },
 		estConfigFile = function(file)
@@ -301,13 +319,24 @@ require("lazy").setup({
 	"VonHeikemen/lsp-zero.nvim",
 	{
 		"williamboman/mason.nvim",
-		dependencies = { "williamboman/mason-lspconfig.nvim", "neovim/nvim-lspconfig" },
+		dependencies = {
+			"williamboman/mason-lspconfig.nvim",
+			"neovim/nvim-lspconfig",
+		},
 
 		config = function()
 			local lsp_zero = require("lsp-zero")
 			require("mason").setup()
 			require("mason-lspconfig").setup({
-				ensure_installed = { "ts_ls", "lua_ls", "eslint", "html", "solargraph", "coffeesense", "angularls" },
+				ensure_installed = {
+					"ts_ls",
+					"lua_ls",
+					"eslint",
+					"html",
+					"solargraph",
+					"coffeesense",
+					"angularls",
+				},
 			})
 
 			on_attach = function(_, _)
@@ -317,7 +346,10 @@ require("lazy").setup({
 				vim.keymap.set("n", "<leader>ar", vim.lsp.buf.rename, {})
 				vim.keymap.set("n", "<leader>aw", vim.lsp.buf.code_action, {})
 				vim.keymap.set("n", "<leader>ak", vim.lsp.buf.hover, {})
-				vim.api.nvim_exec([[ autocmd CursorHold * lua vim.lsp.buf.hover()]], false)
+				vim.api.nvim_exec(
+					[[ autocmd CursorHold * lua vim.lsp.buf.hover()]],
+					false
+				)
 			end
 
 			require("lspconfig").ts_ls.setup({
@@ -391,7 +423,11 @@ require("lazy").setup({
 	},
 	{
 		"iamcco/markdown-preview.nvim",
-		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+		cmd = {
+			"MarkdownPreviewToggle",
+			"MarkdownPreview",
+			"MarkdownPreviewStop",
+		},
 		build = "cd app && yarn install",
 		init = function()
 			vim.g.mkdp_filetypes = { "markdown" }
@@ -453,11 +489,17 @@ vim.opt.conceallevel = 2
 
 -- Functions
 function ZipnosisCommand()
-	require("telescope.builtin").find_files({ cwd = "~/gitstuff/zipnosis", prompt_title = "zipnosis" })
+	require("telescope.builtin").find_files({
+		cwd = "~/gitstuff/zipnosis",
+		prompt_title = "zipnosis",
+	})
 end
 
 function ZipnosisGrepCommand()
-	require("telescope.builtin").live_grep({ cwd = "~/gitstuff/zipnosis/", prompt_title = "zipnosis grep" })
+	require("telescope.builtin").live_grep({
+		cwd = "~/gitstuff/zipnosis/",
+		prompt_title = "zipnosis grep",
+	})
 end
 
 function FlorenceGrepCommand()
@@ -487,10 +529,16 @@ function FindModifiedFile(suffix)
 	if fullExt == "haml" and baseExt == "html" and fileName == "index" then
 		-- Convert index.html.haml to component.js.coffee
 		targetFileName = "component.js.coffee"
-	elseif fullExt == "coffee" and baseExt == "js" and fileName == "component" then
+	elseif
+		fullExt == "coffee"
+		and baseExt == "js"
+		and fileName == "component"
+	then
 		-- Convert component.js.coffee to index.html.haml
 		targetFileName = "index.html.haml"
-	elseif (fullExt == "coffee" or fullExt == "haml") and suffix == ".stories" then
+	elseif
+		(fullExt == "coffee" or fullExt == "haml") and suffix == ".stories"
+	then
 		-- Exclude adding `.stories` for .coffee or .haml files
 		targetFileName = fileName .. "." .. fullExt
 	elseif (fullExt == "coffee" or fullExt == "haml") and suffix == ".test" then
