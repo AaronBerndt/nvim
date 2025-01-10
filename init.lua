@@ -20,7 +20,6 @@ require("lazy").setup({
 	"github/copilot.vim",
 	"metakirby5/codi.vim",
 	"svermeulen/vim-subversive",
-	-- { "glacambre/firenvim", build = ":call firenvim#install(0)" },
 	{
 		"ThePrimeagen/harpoon",
 		branch = "harpoon2",
@@ -78,10 +77,10 @@ require("lazy").setup({
 				formatters_by_ft = {
 					lua = { "stylua" },
 					python = { "isort", "black" },
-					typescript = { { "prettierd" } },
-					json = { { "prettierd" } },
-					typescriptreact = { { "prettierd" } },
-					javascript = { { "prettierd" } },
+					typescript = { "prettierd" },
+					json = { "prettierd" },
+					typescriptreact = { "prettierd" },
+					javascript = { "prettierd" },
 				},
 			})
 
