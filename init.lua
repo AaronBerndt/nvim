@@ -11,6 +11,7 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
+vim.g.maplocalleader = ","
 require("lazy").setup({
   "folke/which-key.nvim",
   {
@@ -92,7 +93,6 @@ require("lazy").setup({
         },
       })
       vim.keymap.set("n", "<leader>cc", ":CodeCompanionChat<CR>", {})
-      vim.keymap.set("n", "<leader>ca", ":CodeCompanion<CR>", {})
     end,
   },
 
@@ -579,59 +579,179 @@ function FlorenceCommand()
   })
 end
 
--- keybindings
-function FindModifiedFile(suffix)
-  -- Get the base name of the current file (without path)
-  local fileName = vim.fn.expand("%:t:r")
-  -- Get the full extension of the current file
-  local fullExt = vim.fn.expand("%:e")
-  local baseExt = vim.fn.expand("%:r:e") -- Extension before the last dot
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
+local pickers = require("telescope.pickers")
+local finders = require("telescope.finders")
+local conf = require("telescope.config").values
 
-  -- Special handling for index.html.haml <-> component.js.coffee
-  local targetFileName
-  if fullExt == "haml" and baseExt == "html" and fileName == "index" then
-    -- Convert index.html.haml to component.js.coffee
-    targetFileName = "component.js.coffee"
-  elseif fullExt == "coffee" and baseExt == "js" and fileName == "component" then
-    -- Convert component.js.coffee to index.html.haml
-    targetFileName = "index.html.haml"
-  elseif (fullExt == "coffee" or fullExt == "haml") and suffix == ".stories" then
-    -- Exclude adding `.stories` for .coffee or .haml files
-    targetFileName = fileName .. "." .. fullExt
-  elseif (fullExt == "coffee" or fullExt == "haml") and suffix == ".test" then
-    -- Convert `.test` to `.spec` for .coffee or .haml files
-    targetFileName = fileName .. ".spec." .. fullExt
-  else
-    -- Handle generic suffix logic
-    if fileName:sub(-#suffix) == suffix then
-      -- If the file contains the suffix, remove it and search for the original file
-      targetFileName = fileName:sub(1, -#suffix - 1) .. "." .. fullExt
-    else
-      -- If the file does not contain the suffix, add it
-      targetFileName = fileName .. suffix .. "." .. fullExt
-    end
-  end
+local commands = {
+  { name = "Start Dev Server", command = "cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx dev", terminal = 1 },
+  { name = "Start Storybook", command = "cd ~/gitstuff/florence-fe && nx storybook virtual-care", terminal = 2 },
+  { name = "Start Nginx", command = "cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx nginx", terminal = 3 },
+  {
+    name = "Start Nginx (Alternate)",
+    command = "cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx nginx",
+    terminal = 4,
+  },
+  { name = "Run Tests", command = "cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx test", terminal = 5 },
+  {
+    name = "Run Storybook Tests",
+    command = "cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx test-storybook",
+    terminal = 6,
+  },
+  { name = "Run Linter", command = "cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx lint", terminal = 7 },
+  { name = "Yarn dev", command = "yarn dev", terminal = 8 },
+  { name = "Yarn Storybook", command = "yarn storybook", terminal = 9 },
+}
 
-  -- Use the 'rg' command to search for the file in the current directory
-  local cmd = "rg --files | grep '" .. targetFileName .. "'"
-  local handle = io.popen(cmd)
-  local result = handle:read("*a")
-  handle:close()
-
-  -- Split the result into lines (file paths)
-  local files = {}
-  for file in result:gmatch("[^\r\n]+") do
-    table.insert(files, file)
-  end
-
-  -- If no files were found, print a message and return
-  if #files == 0 then
-    print("No file found for '" .. targetFileName .. "'")
+-- Function to run the command in ToggleTerm
+local function run_command(entry)
+  if not entry then
     return
   end
 
-  -- Open the first file found in a vertical split
-  vim.cmd("vsplit " .. files[1])
+  local term_cmd =
+    string.format(entry.terminal .. "TermExec cmd='%s' direction=float go_back=0 id=%d", entry.command, entry.terminal)
+
+  vim.cmd(term_cmd)
+end
+
+-- Telescope Picker for Commands
+local function open_command_picker()
+  pickers
+    .new({}, {
+      prompt_title = "Run Command",
+      finder = finders.new_table({
+        results = commands,
+        entry_maker = function(entry)
+          return {
+            value = entry,
+            display = entry.name,
+            ordinal = entry.name,
+          }
+        end,
+      }),
+      sorter = conf.generic_sorter({}),
+      attach_mappings = function(prompt_bufnr, map)
+        actions.select_default:replace(function()
+          actions.close(prompt_bufnr)
+          local selection = action_state.get_selected_entry()
+          run_command(selection.value)
+        end)
+        return true
+      end,
+    })
+    :find()
+end
+
+-- Function to open a running terminal in ToggleTerm
+
+local function get_open_terminals()
+  local terminals = {}
+  for i = 1, 10 do -- Check up to 10 terminals
+    local ok, _ = pcall(vim.cmd, string.format("ToggleTermToggleAll id=%d", i))
+    if ok then
+      table.insert(terminals, { name = string.format("Terminal %d", i), terminal = i })
+    end
+  end
+  return terminals
+end
+
+-- Telescope Picker
+
+-- Telescope Picker for Open Terminals
+local function open_terminal_picker()
+  local terminals = get_open_terminals()
+  if #terminals == 0 then
+    print("No open terminals found.")
+    return
+  end
+  pickers
+    .new({}, {
+      prompt_title = "Open Running Terminal",
+      finder = finders.new_table({
+        results = terminals,
+        entry_maker = function(entry)
+          return {
+            value = entry,
+            display = entry.name,
+            ordinal = entry.name,
+          }
+        end,
+      }),
+      sorter = conf.generic_sorter({}),
+      attach_mappings = function(prompt_bufnr, map)
+        actions.select_default:replace(function()
+          actions.close(prompt_bufnr)
+          local selection = action_state.get_selected_entry()
+          open_terminal(selection.value)
+        end)
+        return true
+      end,
+    })
+    :find()
+end
+
+-- Command to open the picker
+vim.api.nvim_create_user_command("TelescopeCommands", open_command_picker, {})
+vim.api.nvim_create_user_command("TelescopeOpenTerminals", open_terminal_picker, {})
+
+function FindModifiedFile(suffix)
+  local current_file = vim.fn.expand("%:p") -- Full path of the current file
+  local file_name = vim.fn.expand("%:t:r") -- File name without extension
+  local file_ext = vim.fn.expand("%:e") -- File extension
+  local dir_path = vim.fn.expand("%:p:h") -- Directory path
+
+  -- If it's a CoffeeScript file, find the templateUrl and open it
+  if file_ext == "coffee" then
+    local file = io.open(current_file, "r")
+    if file then
+      for line in file:lines() do
+        local template_path = line:match('templateUrl:%s*"(.-)"')
+        if template_path then
+          local full_template_path = dir_path .. "/" .. template_path
+          file:close() -- Close file before opening
+          if vim.fn.filereadable(full_template_path) == 1 then
+            vim.cmd("vsplit " .. vim.fn.fnameescape(full_template_path))
+            return
+          end
+        end
+      end
+      file:close() -- Ensure file is closed if not found
+    end
+  end
+
+  -- If it's index.html.haml, find component.js.coffee
+  if file_name == "index" and vim.fn.expand("%:e:e") == "html.haml" then
+    local target_file = dir_path .. "/component.js.coffee"
+    if vim.fn.filereadable(target_file) == 1 then
+      vim.cmd("vsplit " .. vim.fn.fnameescape(target_file))
+      return
+    end
+  end
+
+  -- Generic suffix-based lookup for other files
+  if suffix and suffix ~= "" then
+    -- Try file with suffix
+    local target_file = dir_path .. "/" .. file_name .. suffix .. "." .. file_ext
+    if vim.fn.filereadable(target_file) == 1 then
+      vim.cmd("vsplit " .. vim.fn.fnameescape(target_file))
+      return
+    end
+
+    -- Try removing suffix from filename
+    local base_name = file_name:gsub(suffix .. "$", "")
+    if base_name ~= file_name then -- Avoid unnecessary checks
+      local original_file = dir_path .. "/" .. base_name .. "." .. file_ext
+      if vim.fn.filereadable(original_file) == 1 then
+        vim.cmd("vsplit " .. vim.fn.fnameescape(original_file))
+        return
+      end
+    end
+  end
+
+  print("No corresponding file found.")
 end
 
 function FindTest()
@@ -653,44 +773,9 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 
 -- Keymaps
 vim.keymap.set("n", "<leader>r", "<Plug>(SubversiveSubstitute)")
-vim.keymap.set(
-  "n",
-  "<leader>yy",
-  ":1TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx dev' open=0 <CR>"
-)
-vim.keymap.set(
-  "n",
-  "<leader>ys",
-  ":2TermExec direction='float' cmd='cd ~/gitstuff/florence-fe && nx storybook virtual-care' open=0 <CR>"
-)
-vim.keymap.set(
-  "n",
-  "<leader>yn",
-  ":3TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx nginx' open=0 <CR>"
-)
-vim.keymap.set("n", "<leader>`", ":ToggleTerm direction='float' <CR>")
-vim.keymap.set(
-  "n",
-  "<leader>yn",
-  ":4TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ && nx nginx' open=0 <CR>"
-)
-vim.keymap.set(
-  "n",
-  "<leader>yt",
-  ":5TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ &&  nx test' open=1 <CR>"
-)
-vim.keymap.set(
-  "n",
-  "<leader>yr",
-  ":6TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ &&  nx test-storybook' open=1 <CR>"
-)
-vim.keymap.set(
-  "n",
-  "<leader>yl",
-  ":7TermExec direction='float' cmd='cd ~/gitstuff/florence-fe/apps/virtual-care/ &&  nx lint' open=1 <CR>"
-)
 
 vim.keymap.set("n", "<leader>jl", ":8TermExec direction='float' cmd='jira issue list' open=1 <CR>")
+vim.keymap.set("n", "<leader>yy", ":TelescopeCommands<CR>")
 
 vim.keymap.set("n", "<leader>`", ":4ToggleTerm direction='float' <CR>")
 vim.keymap.set("n", "<c-l>", ":wincmd l<CR>")
