@@ -41,6 +41,26 @@ require("lazy").setup({
 	"justinmk/vim-sneak",
 	"github/copilot.vim",
 	"metakirby5/codi.vim",
+{
+  "folke/sidekick.nvim",
+  opts = {
+    -- add any options here
+    cli = {
+      mux = {
+        backend = "tmux",
+        enabled = true,
+      },
+    },
+
+  },
+  keys = {
+    {
+      "<leader>ac",
+      function() require("sidekick.cli").toggle({ name = "claude", focus = true }) end,
+      desc = "Sidekick Toggle Claude",
+    },
+  },
+},
 	"svermeulen/vim-subversive",
 	{
 		"OXY2DEV/markview.nvim",
