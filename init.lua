@@ -36,7 +36,6 @@ require("lazy").setup({
 		},
 	},
 	"kchmck/vim-coffee-script",
-	"folke/neodev.nvim",
 	"shaunsingh/nord.nvim",
 	"justinmk/vim-sneak",
 	"github/copilot.vim",
@@ -55,6 +54,11 @@ require("lazy").setup({
   },
   keys = {
     {
+      "<leader>aa",
+      function() require("sidekick.cli").toggle() end,
+      desc = "Sidekick Toggle CLI",
+    },
+    {
       "<leader>ac",
       function() require("sidekick.cli").toggle({ name = "claude", focus = true }) end,
       desc = "Sidekick Toggle Claude",
@@ -65,11 +69,6 @@ require("lazy").setup({
 	{
 		"OXY2DEV/markview.nvim",
 		lazy = false,
-	},
-	{
-		"ThePrimeagen/harpoon",
-		branch = "harpoon2",
-		dependencies = { "nvim-lua/plenary.nvim" },
 	},
 	{ "mistweaverco/kulala.nvim", opts = {} },
 	{
@@ -246,53 +245,6 @@ require("lazy").setup({
 		config = function()
 			local builtin = require("telescope.builtin")
 			local conf = require("telescope.config").values
-			local harpoon = require("harpoon")
-			harpoon:setup({})
-			local function toggle_telescope(harpoon_files)
-				local file_paths = {}
-				for _, item in ipairs(harpoon_files.items) do
-					table.insert(file_paths, item.value)
-				end
-
-				require("telescope.pickers")
-					.new({}, {
-						prompt_title = "Harpoon",
-						finder = require("telescope.finders").new_table({
-							results = file_paths,
-						}),
-						previewer = conf.file_previewer({}),
-						sorter = conf.generic_sorter({}),
-					})
-					:find()
-			end
-
-			vim.keymap.set("n", "<leader>fh", function()
-				toggle_telescope(harpoon:list())
-			end, { desc = "Open harpoon window" })
-			vim.keymap.set("n", "<leader>aa", function()
-				harpoon:list():add()
-			end)
-
-			vim.keymap.set("n", "<leader>a1", function()
-				harpoon:list():select(1)
-			end)
-			vim.keymap.set("n", "<leader>a2", function()
-				harpoon:list():select(2)
-			end)
-			vim.keymap.set("n", "<leader>a3", function()
-				harpoon:list():select(3)
-			end)
-			vim.keymap.set("n", "<leader>a4", function()
-				harpoon:list():select(4)
-			end)
-
-			-- Toggle previous & next buffers stored within Harpoon list
-			vim.keymap.set("n", "<C-S-P>", function()
-				harpoon:list():prev()
-			end)
-			vim.keymap.set("n", "<C-S-N>", function()
-				harpoon:list():next()
-			end)
 
 			vim.keymap.set("n", "<leader>ff", builtin.find_files, {})
 			vim.keymap.set("n", "<leader>fg", builtin.live_grep, {})
@@ -412,55 +364,42 @@ require("lazy").setup({
 			)
 		end,
 	},
-	"VonHeikemen/lsp-zero.nvim",
 	{
 		"williamboman/mason.nvim",
-		dependencies = { "williamboman/mason-lspconfig.nvim", "neovim/nvim-lspconfig" },
+		dependencies = { "williamboman/mason-lspconfig.nvim" },
 
 		config = function()
-			local lsp_zero = require("lsp-zero")
 			require("mason").setup()
 			require("mason-lspconfig").setup({
 				ensure_installed = { "ts_ls", "lua_ls", "eslint", "html", "solargraph", "angularls" },
 			})
 
-			on_attach = function(_, _)
-				-- local buf = { buffer = bufnr }
-				vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
-				vim.keymap.set("n", "gi", vim.lsp.buf.implementation, {})
-				vim.keymap.set("n", "<leader>ar", vim.lsp.buf.rename, {})
-				vim.keymap.set("n", "<leader>aw", vim.lsp.buf.code_action, {})
-				vim.keymap.set("n", "<leader>ak", vim.lsp.buf.hover, {})
-				vim.api.nvim_exec([[ autocmd CursorHold * lua vim.lsp.buf.hover()]], false)
-			end
-
-			require("lspconfig").ts_ls.setup({
-				on_attach = on_attach,
+			vim.api.nvim_create_autocmd("LspAttach", {
+				callback = function(args)
+					local buf = args.buf
+					vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = buf })
+					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { buffer = buf })
+					vim.keymap.set("n", "<leader>ar", vim.lsp.buf.rename, { buffer = buf })
+					vim.keymap.set("n", "<leader>aw", vim.lsp.buf.code_action, { buffer = buf })
+					vim.keymap.set("n", "<leader>ak", vim.lsp.buf.hover, { buffer = buf })
+					vim.api.nvim_create_autocmd("CursorHold", {
+						buffer = buf,
+						callback = function()
+							vim.lsp.buf.hover()
+						end,
+					})
+				end,
 			})
 
-			require("lspconfig").html.setup({
-				on_attach = on_attach,
-			})
+			vim.lsp.config("ts_ls", {})
+			vim.lsp.config("html", {})
+			vim.lsp.config("eslint", {})
+			vim.lsp.config("lua_ls", {})
+			vim.lsp.config("angularls", {})
+			vim.lsp.config("coffeesense", {})
+			vim.lsp.config("solargraph", {})
 
-			require("lspconfig").eslint.setup({
-				on_attach = on_attach,
-			})
-
-			require("lspconfig").lua_ls.setup({
-				on_attach = on_attach,
-			})
-
-			require("lspconfig").angularls.setup({
-				on_attach = on_attach,
-			})
-
-			require("lspconfig").coffeesense.setup({
-				on_attach = on_attach,
-			})
-
-			require("lspconfig").solargraph.setup({
-				on_attach = on_attach,
-			})
+			vim.lsp.enable({ "ts_ls", "html", "eslint", "lua_ls", "angularls", "coffeesense", "solargraph" })
 		end,
 	},
 	{
