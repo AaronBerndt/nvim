@@ -289,19 +289,6 @@ require("lazy").setup({
 	{
 		"folke/noice.nvim",
 		event = "VeryLazy",
-		opts = {
-			routes = {
-				{
-					filter = {
-						event = "notify",
-						find = "No information available",
-					},
-					opts = {
-						skip = true,
-					},
-				},
-			},
-		},
 		dependencies = {
 			"MunifTanjim/nui.nvim",
 		},
@@ -309,6 +296,17 @@ require("lazy").setup({
 			local noice = require("noice")
 
 			noice.setup({
+				routes = {
+					{
+						filter = {
+							event = "notify",
+							find = "No information available",
+						},
+						opts = {
+							skip = true,
+						},
+					},
+				},
 				lsp = {
 					-- override markdown rendering so that **cmp** and other plugins use **Treesitter**
 					override = {
@@ -366,7 +364,7 @@ require("lazy").setup({
 	},
 	{
 		"williamboman/mason.nvim",
-		dependencies = { "williamboman/mason-lspconfig.nvim" },
+		dependencies = { "williamboman/mason-lspconfig.nvim", "neovim/nvim-lspconfig" },
 
 		config = function()
 			require("mason").setup()
@@ -391,15 +389,8 @@ require("lazy").setup({
 				end,
 			})
 
-			vim.lsp.config("ts_ls", {})
-			vim.lsp.config("html", {})
-			vim.lsp.config("eslint", {})
-			vim.lsp.config("lua_ls", {})
-			vim.lsp.config("angularls", {})
-			vim.lsp.config("coffeesense", {})
-			vim.lsp.config("solargraph", {})
-
-			vim.lsp.enable({ "ts_ls", "html", "eslint", "lua_ls", "angularls", "coffeesense", "solargraph" })
+			local servers = { "ts_ls", "html", "eslint", "lua_ls", "angularls", "solargraph" }
+			vim.lsp.enable(servers)
 		end,
 	},
 	{
