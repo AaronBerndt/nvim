@@ -323,6 +323,102 @@ modified.
 6. Ran a second session with `--setting-sources '' --settings slow.json` to test timeout and async
    behaviour.
 
+## Follow-up verification
+
+Re-tested on 2026-10-24 with Claude Code 2.1.310 running in a `jobstart({term=true})` terminal inside a
+headless nvim (`--listen`). Hooks came only from `--settings`, with `--setting-sources ''`, and
+`~/.claude/settings.json` was not touched. The parent nvim deleted every `CLAUDE*` variable before
+`jobstart`, so the earlier "Transcript saving is off" artifact went away. The nvim recorded three
+streams:
+- **Hook arrivals:** a `--remote-expr` callback from each hook.
+- **fs_event:** a `vim.uv` fs_event on `~/.claude/sessions/`.
+- **Polling:** a 50 ms poll of `~/.claude/sessions/<jobpid>.json` (mtime, `status`, `waitingFor`).
+
+Timestamps below are wall-clock times taken from `gettimeofday`.
+
+### F1. Async PermissionRequest / AskUserQuestion hooks don't change the dialog [verified]
+
+The config was `"async": true` on PermissionRequest, PreToolUse, PostToolUse, Notification, Stop
+and the other state events.
+- **Bash permission:** the full dialog appeared (1 Yes / 2 always allow / 3 auto mode / 4 No, plus
+  "Esc to cancel · Tab to amend"). Approving ran the tool (`made.txt` created), and PostToolUse and
+  Stop then fired. A **no-hooks baseline** (`--settings none.json` = `{}`) showed exactly the same
+  dialog and behaviour.
+- **AskUserQuestion:** the normal question picker appeared, and choosing option 2 delivered
+  "→ Blue" to Claude. The async PermissionRequest hook fired with `tool_name: "AskUserQuestion"`.
+- **Ordering:** the async hooks arrived in nvim about 30-60 ms after the hook started.
+  `PreToolUse` and `PermissionRequest` start about 20-30 ms apart, so they can arrive almost
+  together. Order by the hook's own start timestamp.
+
+### F2. SessionEnd reaches nvim on every exit path tested [verified]
+
+Both an `async: true` SessionEnd hook and a synchronous `timeout: 2` one were registered.
+
+| Exit path | `reason` | async reached nvim | sync reached nvim | SessionEnd -> job exit |
+|---|---|---|---|---|
+| `/exit` | `prompt_input_exit` | yes | yes | ~0.5 s |
+| Ctrl-C Ctrl-C (idle) | `prompt_input_exit` | yes | yes | ~0.5 s |
+| `jobstop()` while idle | `other` | yes | yes | ~0.5 s |
+| `jobstop()` mid-turn (busy) | `other` | yes | yes | ~0.5 s |
+
+In every case the hook reached nvim before the job's `on_exit`. Two paths were not tested:
+- **nvim itself quitting:** the server socket would be gone, so the callback could only fail.
+  This is harmless with `|| true; exit 0`.
+- **SIGKILL:** no hook can run.
+
+`on_exit` is still the authoritative exited signal.
+
+### F3. `~/.claude/sessions/<pid>.json` registry [verified, undocumented]
+
+The file is keyed by the claude process pid, which equals `jobpid()` for a direct `jobstart`.
+- **Lifecycle:** it is created at startup (`status` absent at first, then `idle` about 30 ms later).
+  It is **deleted** on every exit path above, about 50-70 ms before the SessionEnd hook arrives.
+- **Fields:** `pid`, `sessionId`, `cwd`, `status`, `updatedAt`, `statusUpdatedAt`, `name`,
+  `messagingSocketPath`, and others. `waitingFor` is present only while `status` is `waiting`.
+  Observed values were `"permission prompt"` for tool permission and `"input needed"` for
+  AskUserQuestion.
+- **Rewritten on every status change:** each transition below came with a new mtime and an fs_event
+  naming `<pid>.json` on the directory watch. That happened before the 50 ms poll noticed the change
+  every time. A directory `fs_event` watcher is therefore sufficient. Sometimes two fs_events fire
+  per write, so dedupe on content.
+- **Waiting matches PermissionRequest:**
+  - Bash: hook start 006.572, registry `waiting` mtime 006.585. That is +12 ms after the hook
+    started, and the fs_event arrived before the hook's callback.
+  - AskUserQuestion: 052.100 vs 052.109, +9 ms. Again `waiting` arrived before the hook's callback.
+  - The registry went `busy` on prompt submit about 25 ms after the UserPromptSubmit hook started.
+  - It went `busy` again about 60 ms after the user approved or answered.
+  - It went `idle` at the same moment as Stop.
+
+**Esc cases. No Stop hook fired in any of them, and no PostToolUse, PostToolUseFailure or
+PermissionDenied fired either.**
+
+| Case | registry after the effective Esc | latency |
+|---|---|---|
+| Esc rejecting a permission prompt | `waiting` -> `idle` (file rewritten) | 128 ms |
+| Esc interrupting a streaming turn ("Interrupted · What should Claude do instead?") | `busy` -> `idle` (file rewritten) | 132 ms |
+| Esc interrupting before any output (prompt text restored to the input box) | `busy` -> `idle` (file rewritten) | 112 ms |
+
+**Gotcha: vim editor mode.** This user has `editorMode: vim`. While a turn runs and the input box is
+in INSERT mode, the **first Esc only leaves INSERT mode**, and the turn keeps running with status
+still `busy`. A **second Esc** interrupts. Plugin logic that marks a session idle when the user
+sends `<Esc>` would be wrong here. The registry stays correct because it changes only on the real
+interrupt.
+
+**Conclusion for state detection:**
+- The registry tracks busy, waiting and idle exactly, including both Esc cases that hooks miss,
+  within about 135 ms. It is visible to a directory fs_event watcher, and it doesn't depend on
+  hooks at all: the no-hooks baseline showed the same idle/busy/waiting/busy/idle sequence.
+- The cost is that it is undocumented, its format could change without notice, and it gives no
+  event payload (tool name, message).
+- **Sensible design:**
+  - Use the registry for the state, keyed by `jobpid`.
+  - Use hooks only for enrichment: `tool_name`, `last_assistant_message`, `notification_type`.
+  - Keep `on_exit` for exited.
+  - Fall back to hooks alone (accepting the Esc blind spot) if the registry file is ever missing.
+
+Scratch transcripts from these runs (under `~/.claude/projects/-tmp-...-scratchpad-exp-proj/`) were
+deleted afterwards.
+
 ## Sources
 
 - [hooks]: Claude Code hooks reference: https://code.claude.com/docs/en/hooks (sections: hook
