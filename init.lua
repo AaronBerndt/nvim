@@ -40,31 +40,13 @@ require("lazy").setup({
 	"justinmk/vim-sneak",
 	"github/copilot.vim",
 	"metakirby5/codi.vim",
-{
-  "folke/sidekick.nvim",
-  opts = {
-    -- add any options here
-    cli = {
-      mux = {
-        backend = "tmux",
-        enabled = true,
-      },
-    },
-
-  },
-  keys = {
-    {
-      "<leader>aa",
-      function() require("sidekick.cli").toggle() end,
-      desc = "Sidekick Toggle CLI",
-    },
-    {
-      "<leader>ac",
-      function() require("sidekick.cli").toggle({ name = "claude", focus = true }) end,
-      desc = "Sidekick Toggle Claude",
-    },
-  },
-},
+	{
+		url = "git@github.com:AaronBerndt/claude-sessions.nvim.git",
+		lazy = false,
+		config = function()
+			require("claude-sessions").setup({})
+		end,
+	},
 	"svermeulen/vim-subversive",
 	{
 		"OXY2DEV/markview.nvim",
@@ -218,7 +200,7 @@ require("lazy").setup({
 					},
 					lualine_b = { "filename", "branch" },
 					lualine_c = { "fileformat" },
-					lualine_x = {},
+					lualine_x = { require("claude-sessions").statusline },
 					lualine_y = { "filetype", "progress" },
 					lualine_z = {
 						{ "location", separator = { right = "" }, left_padding = 2 },
@@ -228,7 +210,7 @@ require("lazy").setup({
 					lualine_a = { "filename" },
 					lualine_b = {},
 					lualine_c = {},
-					lualine_x = {},
+					lualine_x = { require("claude-sessions").statusline },
 					lualine_y = {},
 					lualine_z = { "location" },
 				},
